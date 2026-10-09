@@ -1,6 +1,6 @@
 import { DashboardResponse, SolarSimulationResult, AnalyzeResult, ActionCard, EventItem, CityContext, WeeklyPlan } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export async function fetchDashboard(city: string = 'Bengaluru'): Promise<DashboardResponse> {
   const res = await fetch(`${API_BASE}/dashboard?city=${encodeURIComponent(city)}`);
