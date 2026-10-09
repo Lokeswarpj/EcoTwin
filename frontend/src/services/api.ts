@@ -140,9 +140,8 @@ function getStarterActions(city: string): ActionCard[] {
   ];
 }
 
-// -------------------------------------------------------------
-// Public API Functions with Automatic Resilient Fallback
-// -------------------------------------------------------------
+// In-memory store to keep dynamically analyzed action cards preserved across re-renders/fallbacks
+let storedActions: ActionCard[] = getStarterActions('Bengaluru');
 
 export async function fetchDashboard(city: string = 'Bengaluru'): Promise<DashboardResponse> {
   try {
@@ -163,7 +162,7 @@ export async function fetchDashboard(city: string = 'Bengaluru'): Promise<Dashbo
         days_left_in_month: 21,
         budget_forecast_alert: 'Planetary budget optimal. 8.2 kg CO2e daily headroom maintained.'
       },
-      recent_actions: getStarterActions(city),
+      recent_actions: [...storedActions],
       recent_events: [
         {
           id: 'evt-1',
@@ -228,6 +227,14 @@ export async function simulateSolar(roofAreaKw: number, city: string = 'Bengalur
 }
 
 export async function toggleActionStep(actionId: string, stepIdx: number, done: boolean): Promise<any> {
+  storedActions = storedActions.map((a) => {
+    if (a.id === actionId && a.steps && a.steps[stepIdx]) {
+      const newSteps = [...a.steps];
+      newSteps[stepIdx] = { ...newSteps[stepIdx], done };
+      return { ...a, steps: newSteps };
+    }
+    return a;
+  });
   try {
     return await fetchSafeJson<any>(`${API_BASE}/actions/${actionId}/step/${stepIdx}?done=${done}`, {
       method: 'POST'
@@ -246,22 +253,23 @@ export async function analyzeMedia(
   text?: string,
   city: string = 'Bengaluru'
 ): Promise<AnalyzeResult> {
-  try {
-    const formData = new FormData();
-    if (file) formData.append('file', file);
-    if (text) formData.append('input_text', text);
-    formData.append('city', city);
+  const runAnalysis = async (): Promise<AnalyzeResult> => {
+    try {
+      const formData = new FormData();
+      if (file) formData.append('file', file);
+      if (text) formData.append('input_text', text);
+      formData.append('city', city);
 
-    return await fetchSafeJson<AnalyzeResult>(`${API_BASE}/analyze/${type}`, {
-      method: 'POST',
-      body: formData
-    });
-  } catch {
-    // High-fidelity, deterministic client-side simulation when backend is unreachable (e.g. Vercel cloud deployment)
-    const nowIso = new Date().toISOString();
-    const actionId = `action-snap-${Math.random().toString(36).substring(2, 8)}`;
-    const eventId = `evt-${Math.random().toString(36).substring(2, 8)}`;
-    const ts = getTimestamp();
+      return await fetchSafeJson<AnalyzeResult>(`${API_BASE}/analyze/${type}`, {
+        method: 'POST',
+        body: formData
+      });
+    } catch {
+      // High-fidelity, deterministic client-side simulation when backend is unreachable (e.g. Vercel cloud deployment)
+      const nowIso = new Date().toISOString();
+      const actionId = `action-snap-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+      const eventId = `evt-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+      const ts = getTimestamp();
 
     if (type === 'food') {
       return {
@@ -509,6 +517,13 @@ export async function analyzeMedia(
       ]
     };
   }
+};
+
+  const result = await runAnalysis();
+  if (result && result.action_card) {
+    storedActions = [result.action_card, ...storedActions.filter((a) => a.id !== result.action_card.id)];
+  }
+  return result;
 }
 
 export async function sendVoiceCommand(transcript: string, city: string = 'Bengaluru'): Promise<AnalyzeResult> {

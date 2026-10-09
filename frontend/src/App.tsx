@@ -43,7 +43,12 @@ export const App: React.FC = () => {
     try {
       const data = await fetchDashboard(selectedCity);
       setDashboardData(data);
-      setActions(data.recent_actions);
+      setActions((prev) => {
+        if (prev.length === 0) return data.recent_actions;
+        const incomingIds = new Set(data.recent_actions.map((a) => a.id));
+        const userCustom = prev.filter((a) => !incomingIds.has(a.id));
+        return [...userCustom, ...data.recent_actions];
+      });
     } catch (e) {
       console.error('Failed to load dashboard', e);
     }
@@ -81,7 +86,6 @@ export const App: React.FC = () => {
             ? `+25 Eco Points awarded! Planet Score improved to ${res.updated_planet_score}.`
             : 'Step unmarked.'
         );
-        loadData(city);
       }
     } catch (e) {
       console.error('Step toggle error', e);
@@ -92,13 +96,33 @@ export const App: React.FC = () => {
 
   const handleAnalysisSuccess = (newAction: ActionCard, trace: TraceItem[]) => {
     setIsAnalyzing(false);
-    setActions((prev) => [newAction, ...prev]);
+    // Prepend new action card immediately
+    setActions((prev) => [newAction, ...prev.filter((a) => a.id !== newAction.id)]);
     setAgentTrace(trace);
     showNotification('AI Agent Audit Complete', `New action card: ${newAction.title} created!`);
-    loadData(city);
+
+    // Optimistically update dashboard stats with this action's impact
+    setDashboardData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        metrics: {
+          ...prev.metrics,
+          planet_score: Math.min(100, Number((prev.metrics.planet_score + (newAction.points / 25)).toFixed(1))),
+          points: prev.metrics.points + newAction.points,
+          monthly_waste_diverted_kg: Number((prev.metrics.monthly_waste_diverted_kg + (newAction.category.includes('Recycle') ? 0.35 : 0)).toFixed(1)),
+          monthly_carbon_used_kg: Math.max(0, Number((prev.metrics.monthly_carbon_used_kg - (newAction.co2_saving_kg || 0)).toFixed(1)))
+        }
+      };
+    });
+
+    // Scroll cleanly to the action stream section
     setTimeout(() => {
-      document.getElementById('action-stream-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+      const el = document.getElementById('action-stream-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 150);
   };
 
   const handleUploadFileScanner = async (file: File) => {

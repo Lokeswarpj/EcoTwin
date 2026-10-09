@@ -31,7 +31,7 @@ export const ActionStream: React.FC<ActionStreamProps> = ({
   };
 
   return (
-    <section id="action-stream-section" className="mb-20">
+    <section id="action-stream-section" className="mb-20 scroll-mt-28">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-3xl lg:text-4xl font-display text-white">{title}</h2>

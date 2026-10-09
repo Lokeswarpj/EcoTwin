@@ -50,7 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       : SUPPORTED_LANGUAGES.find((l) => l.code === language)?.native || 'English';
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-40 glass bg-white/5 border-b border-white/10 px-4 lg:px-8 py-3 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 w-full z-40 bg-[#060c1a]/95 backdrop-blur-md shadow-lg border-b border-white/10 px-4 lg:px-8 py-3 flex items-center justify-between">
       <div className="flex items-center gap-4 lg:gap-8">
         <a href="#" className="text-2xl lg:text-3xl font-display tracking-tight text-white flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.8)] animate-pulse" />
