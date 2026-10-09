@@ -1,6 +1,4 @@
 {
-  "name": "ecotwin",
-  "framework": "vite",
   "buildCommand": "npm --prefix frontend run build",
   "outputDirectory": "frontend/dist",
   "rewrites": [
