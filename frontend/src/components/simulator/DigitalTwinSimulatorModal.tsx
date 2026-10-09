@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { X, Sparkles, Zap, TrendingUp, Trees, DollarSign, ShieldCheck, ArrowRight, Sun, Car, Salad, Wind, ShoppingBag } from 'lucide-react';
+import { X, Sparkles, Zap, TrendingUp, Trees, IndianRupee, ShieldCheck, ArrowRight, Sun, Car, Salad, Wind, ShoppingBag } from 'lucide-react';
 
 interface DigitalTwinSimulatorModalProps {
   isOpen: boolean;
@@ -117,7 +117,7 @@ export const DigitalTwinSimulatorModal: React.FC<DigitalTwinSimulatorModalProps>
           <div className="p-4 rounded-2xl bg-[#061820] border border-emerald-400/40 flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between text-xs text-emerald-300 font-medium mb-1">
               <span>10-Yr Family Savings</span>
-              <DollarSign className="w-4 h-4 text-emerald-400" />
+              <IndianRupee className="w-4 h-4 text-emerald-400" />
             </div>
             <div className="flex items-baseline gap-1">
               <span className="text-2xl font-bold font-display text-white">₹{(sim.tenYearRupeeSaved / 100000).toFixed(2)}L</span>
