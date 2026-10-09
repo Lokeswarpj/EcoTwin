@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, Camera, Mic, Loader2 } from 'lucide-react';
+import { UploadCloud, Camera, Mic, Loader2, FileImage, CheckCircle2 } from 'lucide-react';
 import { analyzeMedia } from '../../services/api';
 import { ActionCard, TraceItem } from '../../types';
 
@@ -14,23 +14,23 @@ type TabType = 'waste' | 'food' | 'energy' | 'mobility';
 const TAB_META: Record<TabType, { label: string; title: string; sub: string }> = {
   waste: {
     label: 'Waste Photo',
-    title: 'Drag & drop waste photo or snap live',
-    sub: 'Supports JPG, PNG, WebP — Instant Gemini 1.5 item classifier'
+    title: 'Upload or drag & drop waste item photo',
+    sub: 'Instant Gemini polymer breakdown, BBMP segregation & landfill diversion'
   },
   food: {
     label: 'Fridge / Receipt',
-    title: 'Upload fridge picture or grocery receipt',
-    sub: 'Scans perishables, estimates spoilage risk & suggests low-emission recipes'
+    title: 'Upload fridge photo or grocery receipt',
+    sub: 'Scans perishables, estimates shelf-life & suggests low-emission recipes'
   },
   energy: {
     label: 'Electricity Bill',
-    title: 'Upload Electricity / Utility bill PDF or image',
-    sub: 'Extracts kWh peak tariff usage & benchmarks against 1.5°C neighborhood target'
+    title: 'Upload BESCOM / Electricity bill PDF or photo',
+    sub: 'Extracts kWh consumption & calculates peak solar load shifting'
   },
   mobility: {
     label: 'Commute Note',
-    title: 'Dictate or write commute route notes',
-    sub: 'Calculate multimodal transit routes with lowest carbon-to-cost ratio'
+    title: 'Describe your daily commute or upload transit ticket',
+    sub: 'Compares Metro vs Bus vs Driving with time and emission trade-offs'
   }
 };
 
@@ -42,19 +42,27 @@ export const UploadHub: React.FC<UploadHubProps> = ({
   const [activeTab, setActiveTab] = useState<TabType>('waste');
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      await processUpload(e.dataTransfer.files[0]);
+      const file = e.dataTransfer.files[0];
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      await processUpload(file);
     }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      await processUpload(e.target.files[0]);
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      await processUpload(file);
     }
   };
 
@@ -89,7 +97,11 @@ export const UploadHub: React.FC<UploadHubProps> = ({
           {(Object.keys(TAB_META) as TabType[]).map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                setActiveTab(tab);
+                setSelectedFile(null);
+                setPreviewUrl(null);
+              }}
               className={`pb-2 transition-all cursor-pointer ${
                 activeTab === tab
                   ? 'text-white font-medium border-b-2 border-white'
@@ -118,49 +130,73 @@ export const UploadHub: React.FC<UploadHubProps> = ({
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`border-2 border-dashed rounded-2xl h-64 flex flex-col items-center justify-center gap-4 transition-all cursor-pointer relative overflow-hidden ${
+        className={`border-2 border-dashed rounded-2xl min-h-[16rem] p-6 flex flex-col items-center justify-center gap-4 transition-all cursor-pointer relative overflow-hidden ${
           isDragging
-            ? 'border-blue-400 bg-white/15'
+            ? 'border-cyan-400 bg-white/15'
             : 'border-white/15 bg-white/5 hover:bg-white/10 hover:border-white/30'
         }`}
       >
         {isLoading ? (
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-3 py-6">
             <Loader2 className="w-10 h-10 text-cyan-400 animate-spin" />
-            <p className="text-sm text-white/80 font-medium">Cooperating Gemini Agents Analyzing Input...</p>
-            <p className="text-xs text-white/40">Router → Specialist → Verifier Pipeline</p>
+            <p className="text-sm text-white/90 font-medium">Cooperating Gemini Agents Auditing Photo...</p>
+            <p className="text-xs text-white/40 font-mono">Router → Specialist → Verifier Pipeline</p>
+          </div>
+        ) : previewUrl ? (
+          <div className="flex flex-col items-center gap-3 py-2">
+            <div className="relative w-32 h-32 rounded-xl overflow-hidden border border-white/20">
+              <img src={previewUrl} alt="Upload preview" className="w-full h-full object-cover" />
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-green-400 font-medium flex items-center gap-1.5 justify-center">
+                <CheckCircle2 className="w-4 h-4" />
+                {selectedFile?.name || 'Photo Ready'}
+              </p>
+              <p className="text-xs text-white/40 mt-0.5">Click to choose a different photo</p>
+            </div>
           </div>
         ) : (
           <>
-            <UploadCloud className="w-10 h-10 text-white/30 group-hover:text-white/60 transition-colors" />
-
-            <div className="text-center px-4">
-              <p className="text-white/70 font-medium text-sm md:text-base">
-                {TAB_META[activeTab].title}
-              </p>
-              <p className="text-xs text-white/40 mt-1">{TAB_META[activeTab].sub}</p>
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-cyan-400">
+              <UploadCloud className="w-8 h-8" />
             </div>
 
-            <div className="flex gap-4 mt-2" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center px-4">
+              <p className="text-white/80 font-medium text-sm md:text-base">
+                {TAB_META[activeTab].title}
+              </p>
+              <p className="text-xs text-white/40 mt-1 max-w-md">{TAB_META[activeTab].sub}</p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-1" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="px-5 py-2.5 rounded-full bg-white text-black font-medium text-xs md:text-sm hover:bg-white/90 transition-all flex items-center gap-2 shadow-md cursor-pointer"
+              >
+                <FileImage className="w-4 h-4" />
+                Browse Device Photos
+              </button>
+
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onOpenScanner();
                 }}
-                className="p-3 rounded-full bg-white text-black btn-hover shadow-md cursor-pointer"
-                title="Snap with Camera"
+                className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/15 cursor-pointer"
+                title="Camera Scanner"
               >
-                <Camera className="w-5 h-5" />
+                <Camera className="w-4 h-4 text-cyan-300" />
               </button>
+
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleSimulateText('Daily commute Indiranagar to Whitefield 12 km by car');
+                  handleSimulateText('Commute: 12 km to work daily via car vs metro in Bengaluru');
                 }}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/10 cursor-pointer"
-                title="Voice Input"
+                className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/15 cursor-pointer"
+                title="Voice / Text Commute Note"
               >
-                <Mic className="w-5 h-5" />
+                <Mic className="w-4 h-4 text-amber-300" />
               </button>
             </div>
           </>

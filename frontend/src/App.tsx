@@ -88,9 +88,22 @@ export const App: React.FC = () => {
     document.getElementById('action-stream-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleCaptureScanner = async () => {
+  const handleUploadFileScanner = async (file: File) => {
     setScannerOpen(false);
     try {
+      showNotification('Analyzing Photo...', 'Gemini Vision AI is identifying material layers and calculating footprint.');
+      const res = await analyzeMedia('waste', file, undefined, city);
+      handleAnalysisSuccess(res.action_card, res.trace);
+    } catch (e) {
+      console.error(e);
+      showNotification('Analysis Error', 'Could not complete scan. Please try again.');
+    }
+  };
+
+  const handleSimulateCapture = async () => {
+    setScannerOpen(false);
+    try {
+      showNotification('Running AI Planetary Audit...', 'Auditing Tetra Pak packaging sample.');
       const res = await analyzeMedia('waste', null, 'Tetra Pak Milk Carton dry packaging', city);
       handleAnalysisSuccess(res.action_card, res.trace);
     } catch (e) {
@@ -167,7 +180,8 @@ export const App: React.FC = () => {
       <ScannerModal
         isOpen={scannerOpen}
         onClose={() => setScannerOpen(false)}
-        onCapture={handleCaptureScanner}
+        onUploadFile={handleUploadFileScanner}
+        onSimulateCapture={handleSimulateCapture}
       />
       <AutopilotModal
         isOpen={autopilotOpen}
