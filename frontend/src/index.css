@@ -56,32 +56,32 @@ body {
 .delay-400 { animation-delay: 0.4s; }
 .delay-600 { animation-delay: 0.6s; }
 
-/* Glassmorphism Styles - calibrated for high contrast & text clarity over 3D WebGL Earth */
+/* Glassmorphism Styles - frosted 16px glass matching design screenshot */
 .glass {
-  background: rgba(10, 18, 36, 0.86);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 10px 32px 0 rgba(0, 0, 0, 0.55);
+  background: rgba(13, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  background: rgba(13, 23, 46, 0.92);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(16, 28, 52, 0.82);
 }
 
 .glass-card {
-  background: linear-gradient(145deg, rgba(12, 21, 42, 0.92) 0%, rgba(7, 13, 27, 0.96) 100%);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.65);
+  background: linear-gradient(135deg, rgba(14, 24, 44, 0.82) 0%, rgba(9, 16, 30, 0.85) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 20px 56px 0 rgba(0, 0, 0, 0.75);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.6);
 }
 
 .btn-hover {
@@ -187,20 +187,20 @@ input[type="range"]::-webkit-slider-thumb:active {
   scrollbar-width: none;
 }
 
-/* Modal styles - deep non-bleed backdrop blur and ultra-opaque readable modal cards */
+/* Modal styles - matching exact design screenshot frosted glass */
 .modal-overlay {
-  background: rgba(3, 7, 18, 0.88);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(4, 15, 28, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .modal-content-card,
 .modal-overlay .glass-card {
-  background: linear-gradient(145deg, rgba(11, 20, 39, 0.97) 0%, rgba(6, 11, 22, 0.99) 100%) !important;
-  backdrop-filter: blur(36px) !important;
-  -webkit-backdrop-filter: blur(36px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 50px rgba(34, 211, 238, 0.12) !important;
+  background: linear-gradient(145deg, rgba(13, 22, 39, 0.92) 0%, rgba(8, 14, 27, 0.94) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Pulse Glow & Rings */
