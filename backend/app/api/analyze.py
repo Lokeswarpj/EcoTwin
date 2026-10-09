@@ -357,7 +357,7 @@ async def analyze_voice_endpoint(
 
     # Determine intent
     t = voice_transcript.lower()
-    if any(w in t for w in ["metro", "bus", "travel", "km", "cab", "ride", "auto", "walk", "bike", "cycle", "drive"]):
+    if any(w in t for w in ["metro", "bus", "travel", "km", "kms", "cab", "ride", "auto", "walk", "bike", "cycle", "drive", "rapido", "uber", "ola", "taxi", "rickshaw", "scooter", "commute", "transit"]):
         res = await analyze_mobility_endpoint(input_text=voice_transcript)
         return res
     elif any(w in t for w in ["bill", "bescom", "kwh", "electricity", "receipt", "bought"]):
