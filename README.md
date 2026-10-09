@@ -7,8 +7,8 @@
 
 ## 🚀 Live Demo URLs
 
-- **Frontend (React + Vite + TypeScript):** [http://localhost:5173](http://localhost:5173)
-- **Backend (FastAPI + Python 3.14 + Gemini Live):** [http://localhost:8000](http://localhost:8000)
+- **Frontend (React + Vite + TypeScript + Three.js):** [http://localhost:5173](http://localhost:5173)
+- **Backend (FastAPI + Python 3.11+ + Gemini Live):** [http://localhost:8000](http://localhost:8000)
 - **Interactive Swagger Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs)
 - **API Health Check:** [http://localhost:8000/api/health](http://localhost:8000/api/health)
 
@@ -24,21 +24,33 @@ EcoTwin tracks three fundamental environmental currencies within 1.5°C Paris pl
 
 ### 2. Multi-Agent AI Pipeline
 A genuine multi-agent orchestration architecture:
-* **RouterAgent:** Inspects multimodal input (text, photo, receipt, bill) and selects the specialist with confidence scoring.
-* **WasteRecyclingAgent:** Identifies item polymer composition, BBMP / Dry Waste Collection Centre (DWCC) rules, and landfill diversion impact.
-* **FoodWasteGuardAgent:** Scans fridge items / receipts, highlights high-urgency perishables, and generates 3 zero-waste recipes.
-* **EnergyAuditorAgent:** Parses BESCOM utility bills, benchmarks against neighborhood targets, and prioritizes peak solar load-shifting.
-* **MobilityNegotiatorAgent:** Multimodal transit comparison (Metro vs BMTC bus vs Solo car vs EV) balancing carbon vs time vs fare cost.
+* **RouterAgent:** Inspects multimodal input (text, photo, webcam capture, utility bill, voice transcript) and routes to specialists with confidence scoring.
+* **WasteRecyclingAgent:** Identifies item polymer composition, municipal segregation rules (BBMP, DWCC), and landfill diversion impact.
+* **FoodWasteGuardAgent:** Scans fridge items and grocery receipts, highlights perishables nearing expiry, and generates zero-waste batch cooking recipes.
+* **EnergyAuditorAgent & BillAgent:** Parses utility power bills (BESCOM, TSSPDCL, MSEDCL, etc.), benchmarks against neighborhood targets, and prioritizes peak solar load-shifting.
+* **MobilityNegotiatorAgent:** Multimodal transit comparison (Metro vs Bus vs Solo car vs EV) balancing carbon vs time vs fare cost for 6 major metropolitan regions.
 * **ProductSustainabilityAgent:** Audits packaging recyclability, greenwashing claims, and refill alternatives.
-* **CircularExchangeAgent:** Connects users with verified local Bengaluru circular recovery hubs (Hasiru Dala, Saahas, Goonj).
+* **CircularExchangeAgent:** Connects users with verified local circular recovery hubs (Hasiru Dala, Saahas, Goonj).
 * **NegotiatorAgent:** Reconciles sustainability vs convenience trade-offs with transparent justification.
-* **PlannerAgent:** Synthesizes planetary budgets, weather/AQI context, and household needs into a weekly action plan.
+* **PlannerAgent:** Synthesizes planetary budgets, weather/AQI context, and household needs into a weekly action plan (**Planetary Alignment Plan: Week 1**).
 * **VerifierAgent:** Audits output against schemas, boundary constraints, and consistency rules.
-* **Visible Agent Trace Drawer:** Expandable bottom panel allowing hackathon judges to inspect real step-by-step pipeline execution events.
+* **Visible Agent Trace Drawer:** Real-time collapsible drawer displaying step-by-step agent reasoning logs and execution timestamps.
 
-### 3. Deterministic Impact & Solar Engine
-* **No LLM arithmetic hallucination:** All emissions and savings are calculated in Python using verified factors (`emission_factors.json`, CEA Baseline Database, IPCC, and BESCOM power procurement data).
-* **Solar Simulator:** Dynamic what-if rooftop PV model computing annual kWh, CO₂e avoided, payback period, and trees equivalent based on Bengaluru solar irradiance (5.4 peak sun hours/day).
+### 3. Interactive 3D Earth Digital Twin
+* **WebGL Celestial Canvas:** Interactive 3D Earth globe rendered via Three.js with realistic surface maps, specular oceans, and cloud layers reflecting real-time planetary health.
+
+### 4. Interactive Simulator & Circular Hub Locator
+* **Digital Twin Simulator Modal:** Interactive what-if scenario forecasting with sliders for plant-based days, public transit share, rooftop solar capacity, and cooling setpoints.
+* **Circular Facility Map:** Search and locate verified local circular economy hubs, e-waste drop-offs, and composting centers.
+* **Verifiable Sustainability Certificate:** Generates downloadable, tamper-verifiable certificates validating planet score, diverted waste, and avoided emissions.
+
+### 5. Multimodal Voice Assistant & Multilingual UI
+* **Speech-to-Text Voice Agent:** Hands-free logging via microphone, transcribing spoken actions directly into agent tasks.
+* **Regional Languages:** Full dual-language localization supporting English, Hindi (हिन्दी), Kannada (ಕನ್ನಡ), Telugu (తెలుగు), Tamil (தமிழ்), Marathi (मराठी), and Malayalam (മലയാളം).
+
+### 6. Deterministic Impact & Solar Engine
+* **No LLM arithmetic hallucination:** All emissions and savings are calculated in Python using verified factors (`emission_factors.json`, CEA Baseline Database, IPCC, and MNRE benchmark grid mix).
+* **Rooftop Solar PV Simulator:** Area-based sizing calculator (sq ft to kW) computing annual clean generation, ₹ savings, payback period, and trees equivalent.
 
 ---
 
@@ -48,10 +60,10 @@ A genuine multi-agent orchestration architecture:
 EcoTwin/
 ├── backend/                  # Python 3.11+ / FastAPI Server
 │   ├── app/                  # Multi-agent pipelines, routes, impact models
-│   │   ├── agents/           # Router, Waste, Food, Energy, Mobility, Negotiator, Planner, Verifier
+│   │   ├── agents/           # Router, Waste, Food, Energy, Mobility, Bill, Circular, Negotiator, Planner, Verifier
 │   │   ├── api/              # Dashboard, analyze, planner, actions, solar, context, history
 │   │   ├── data/             # Emission factors, solar benchmarks, circular partners, glossary
-│   │   ├── database/         # SQLite DB & repositories
+│   │   ├── database/         # SQLite DB, migrations & repositories
 │   │   ├── schemas/          # Pydantic schemas
 │   │   └── services/         # Impact engine, Gemini client, solar simulator, forecast
 │   ├── tests/                # Automated test suite (9/9 passed)
@@ -61,20 +73,26 @@ EcoTwin/
 │
 ├── frontend/                 # React 18 / TypeScript / Vite Application
 │   ├── src/
-│   │   ├── components/       # Reusable components preserving your supplied design
+│   │   ├── components/       # Component architecture
 │   │   │   ├── layout/       # Navbar, Footer
 │   │   │   ├── dashboard/    # Hero, MetricCards, ScoreGauge
 │   │   │   ├── upload/       # UploadHub (Waste, Fridge, Bills, Commute)
-│   │   │   ├── solar/        # SolarPanel simulator
-│   │   │   ├── actions/      # ActionStream (Checklists & Negotiator cards)
-│   │   │   ├── agents/       # AgentTraceDrawer (Visible pipeline trace)
-│   │   │   └── modals/       # ScannerModal, AutopilotModal, LocationModal, HistoryModal
+│   │   │   ├── solar/        # Rooftop Solar PV Area Simulator
+│   │   │   ├── actions/      # ActionStream (Checklists & Trade-off cards)
+│   │   │   ├── agents/       # AgentTraceDrawer (Live reasoning trace)
+│   │   │   ├── voice/        # Multimodal Voice Assistant modal
+│   │   │   ├── simulator/    # Digital Twin What-If Scenario Simulator
+│   │   │   ├── map/          # Circular Economy Hubs Locator
+│   │   │   ├── certificate/  # Sustainability Certificate modal
+│   │   │   └── modals/       # ScannerModal (Photo/Webcam), AutopilotModal (Week 1), LocationModal
+│   │   ├── i18n/             # Regional language translations
 │   │   ├── services/         # API client
 │   │   ├── types.ts          # TypeScript type definitions
-│   │   ├── index.css         # Glassmorphism, animations & design tokens
+│   │   ├── index.css         # Glassmorphism & custom styling
 │   │   └── App.tsx           # Main application component
-│   ├── package.json          # Frontend dependencies (lucide-react, recharts, etc.)
-│   └── vite.config.ts        # Vite config with backend API proxy (/api -> :8000)
+│   ├── public/textures/      # Three.js high-resolution Earth textures
+│   ├── package.json          # Frontend dependencies (three, lucide-react, recharts, etc.)
+│   └── vite.config.ts        # Vite configuration with backend API proxy
 │
 ├── .gitignore                # Excludes secrets, databases, venvs, and build artifacts
 ├── package.json              # Root package script runner

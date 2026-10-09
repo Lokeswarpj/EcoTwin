@@ -11,6 +11,7 @@ from ..agents.energy import analyze_energy
 from ..agents.mobility import analyze_mobility
 from ..agents.product import analyze_product
 from ..agents.circular import analyze_circular
+from ..agents.bill import analyze_bill_or_receipt
 from ..agents.verifier import verify_output
 from ..database.repositories import add_event, save_action
 
@@ -274,3 +275,95 @@ async def analyze_mobility_endpoint(
         trace=all_trace,
         is_live_ai=mob_res.is_live_ai
     )
+
+@router.post("/bill", response_model=AnalyzeResponse)
+async def analyze_bill_endpoint(
+    file: Optional[UploadFile] = File(None),
+    input_text: Optional[str] = Form(None),
+    city: str = Form("Bengaluru")
+):
+    all_trace: List[TraceItem] = []
+    fname = file.filename if file else None
+    image_bytes = await file.read() if file else None
+
+    # 1. Specialist: Bill/Receipt
+    bill_data, b_trace = analyze_bill_or_receipt(input_text=input_text, image_bytes=image_bytes, city=city)
+    all_trace.extend(b_trace)
+
+    # 2. Verifier
+    v_res, v_trace = verify_output("BillReceiptAuditorAgent", bill_data)
+    all_trace.extend(v_trace)
+
+    action_id = f"action-{uuid.uuid4().hex[:6]}"
+    now_iso = datetime.now(timezone.utc).isoformat()
+    steps = [{"text": s, "done": False} for s in bill_data.get("action_steps", ["Audit line items", "Implement greener alternative"])]
+
+    action_dict = {
+        "id": action_id,
+        "category": f"Bill Audit ({bill_data.get('vendor', 'Utility')})",
+        "title": f"Audit: {bill_data.get('vendor', 'Bill')} (₹{bill_data.get('total_amount_inr', 0):.0f})",
+        "description": f"\"{bill_data.get('action_recommendation', 'Optimized household utility footprint.')}\"",
+        "co2_saving_kg": float(bill_data.get("co2_savings_potential_kg", 25.0)),
+        "points": 40,
+        "color": "amber" if bill_data.get("bill_type") == "electricity" else "green",
+        "agent_name": "BillReceiptAuditorAgent",
+        "status": "pending",
+        "in_plan": False,
+        "steps": steps,
+        "created_at": now_iso
+    }
+    save_action(action_dict)
+
+    event_id = f"evt-{uuid.uuid4().hex[:6]}"
+    event_dict = {
+        "id": event_id,
+        "timestamp": now_iso,
+        "activity_type": "electricity" if bill_data.get("bill_type") == "electricity" else "general",
+        "source": "Bill / Receipt Scan",
+        "description": f"{bill_data.get('vendor')} bill audit (Footprint: {bill_data.get('carbon_footprint_kg', 0):.1f} kg CO2e)",
+        "carbon_impact_kg": float(bill_data.get("carbon_footprint_kg", 15.0)),
+        "waste_diverted_kg": 0.0,
+        "water_consumed_l": 0.0,
+        "confidence": v_res.confidence_adjusted,
+        "assumptions": f"Identified potential monthly savings: ₹{bill_data.get('instant_savings_inr', 0):.0f}",
+        "is_demo": not bill_data.get("is_live_ai", False)
+    }
+    add_event(event_dict)
+
+    return AnalyzeResponse(
+        input_type="bill",
+        specialist="BillReceiptAuditorAgent",
+        data=bill_data,
+        action_card=ActionItemModel(**action_dict),
+        event_logged=EventModel(**event_dict),
+        trace=all_trace,
+        is_live_ai=bill_data.get("is_live_ai", False)
+    )
+
+@router.post("/voice", response_model=AnalyzeResponse)
+async def analyze_voice_endpoint(
+    voice_transcript: str = Form(...),
+    city: str = Form("Bengaluru")
+):
+    all_trace: List[TraceItem] = []
+    ts = datetime.now(timezone.utc).strftime("%H:%M:%S")
+
+    all_trace.append(TraceItem(
+        agent_name="VoiceCopilotAgent",
+        status="INFO",
+        explanation=f"Parsed natural speech intent: \"{voice_transcript}\"",
+        timestamp=ts
+    ))
+
+    # Determine intent
+    t = voice_transcript.lower()
+    if any(w in t for w in ["metro", "bus", "travel", "km", "cab", "ride", "auto", "walk", "bike", "cycle", "drive"]):
+        res = await analyze_mobility_endpoint(input_text=voice_transcript)
+        return res
+    elif any(w in t for w in ["bill", "bescom", "kwh", "electricity", "receipt", "bought"]):
+        res = await analyze_bill_endpoint(file=None, input_text=voice_transcript, city=city)
+        return res
+    else:
+        res = await analyze_waste_endpoint(file=None, input_text=voice_transcript, city=city)
+        return res
+

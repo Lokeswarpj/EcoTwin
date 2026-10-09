@@ -146,10 +146,10 @@ def generate_weekly_plan(city: str = "Bengaluru") -> Tuple[WeeklyPlanResponse, L
         total_co2_savings += item["co2_saving_kg"]
         action_models.append(ActionItemModel(**item_dict))
 
-    week_id = f"week-{datetime.now(timezone.utc).strftime('%Y-%U')}"
+    week_id = "week-1"
     plan_resp = WeeklyPlanResponse(
         week_id=week_id,
-        title=f"Planetary Alignment Plan: Week {datetime.now(timezone.utc).strftime('%U')}",
+        title="Planetary Alignment Plan: Week 1",
         summary=f"3 coordinated micro-actions targeting food freshness, peak solar load, and clean transit. Designed to save ~{total_co2_savings:.1f}kg CO2e.",
         projected_co2e_reduction_kg=round(total_co2_savings, 2),
         actions=action_models,

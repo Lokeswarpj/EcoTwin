@@ -104,29 +104,20 @@ body {
   background-size: 64px 64px;
 }
 
-#space-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -2;
-  pointer-events: none;
-}
-
-#planet-canvas-container {
+#earth-canvas-container {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   z-index: -1;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.75;
-  transition: transform 0.1s ease-out;
+  pointer-events: auto;
+}
+
+#earth-canvas-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
 
 .h1-display {

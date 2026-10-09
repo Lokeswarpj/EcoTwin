@@ -7,9 +7,9 @@ logger = logging.getLogger(__name__)
 
 MODELS_PRIORITY: List[str] = [
     GEMINI_MODEL,
-    "gemini-flash-latest",
     "gemini-2.5-flash",
-    "gemini-2.5-pro"
+    "gemini-2.5-pro",
+    "gemini-flash-latest"
 ]
 
 class GeminiService:

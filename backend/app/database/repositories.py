@@ -199,22 +199,53 @@ def save_action(action_data: Dict[str, Any]) -> str:
 def update_action_step(action_id: str, step_index: int, done: bool) -> bool:
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT steps_json, points FROM actions WHERE id = ?", (action_id,))
+    cursor.execute("SELECT title, steps_json, points, co2_saving_kg FROM actions WHERE id = ?", (action_id,))
     row = cursor.fetchone()
     if not row:
         conn.close()
         return False
     
-    steps = json.loads(row[0]) if row[0] else []
+    title = row[0]
+    steps = json.loads(row[1]) if row[1] else []
+    total_action_points = row[2] or 25
+    co2_saving = float(row[3] or 0.1)
+
     if 0 <= step_index < len(steps):
+        was_done = steps[step_index].get("done", False)
         steps[step_index]["done"] = done
         cursor.execute("UPDATE actions SET steps_json = ? WHERE id = ?", (json.dumps(steps), action_id))
         
+        step_pts = max(10, total_action_points // max(1, len(steps)))
+        step_co2 = round(co2_saving / max(1, len(steps)), 3)
+
+        if done and not was_done:
+            # Award points & log positive action impact event
+            cursor.execute("UPDATE budget_config SET points = points + ? WHERE id = 1", (step_pts,))
+            evt_id = f"evt-step-{uuid.uuid4().hex[:6]}"
+            cursor.execute("""
+                INSERT INTO events (id, timestamp, activity_type, source, description, carbon_impact_kg, waste_diverted_kg, water_consumed_l, confidence, assumptions, is_demo)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                evt_id,
+                datetime.now(timezone.utc).isoformat(),
+                "action",
+                "Action Stream Check",
+                f"Completed: {steps[step_index].get('text', 'Action Step')} ({title})",
+                -step_co2,
+                0.05,
+                0.0,
+                1.0,
+                f"Action reward: +{step_pts} Eco Points, -{step_co2} kg CO2e",
+                0
+            ))
+        elif not done and was_done:
+            # Revert points
+            cursor.execute("UPDATE budget_config SET points = MAX(0, points - ?) WHERE id = 1", (step_pts,))
+
         # Check if all steps done
         all_done = all(s.get("done") for s in steps)
-        if all_done:
-            cursor.execute("UPDATE actions SET status = 'completed' WHERE id = ?", (action_id,))
-            cursor.execute("UPDATE budget_config SET points = points + ? WHERE id = 1", (row[1],))
+        status = 'completed' if all_done else 'pending'
+        cursor.execute("UPDATE actions SET status = ? WHERE id = ?", (status, action_id))
         
         conn.commit()
         conn.close()
@@ -245,16 +276,19 @@ def calculate_dashboard_metrics() -> Dict[str, Any]:
     carbon_budget = float(cfg["monthly_carbon_budget_kg"])
     waste_budget = float(cfg["monthly_waste_budget_kg"])
     water_budget = float(cfg["monthly_water_budget_l"])
+    current_points = int(cfg.get("points", 0))
 
-    # Formula:
-    # Carbon score: 45% weight (1 - used/budget)
-    # Water score: 35% weight (1 - used/budget)
-    # Waste diversion score: 20% weight (diverted / (budget * 0.5))
+    # Balanced Planet Score Formula:
+    # 1. Carbon Score: 40% weight (1 - used/budget)
+    # 2. Water Score: 30% weight (1 - used/budget)
+    # 3. Waste Diversion Score: 20% weight (diverted / (budget * 0.5))
+    # 4. Eco Points / Proactive Action Bonus: up to 10% bonus boost
     carbon_ratio = max(0.0, 1.0 - (carbon_used / max(1.0, carbon_budget)))
     water_ratio = max(0.0, 1.0 - (water_used / max(1.0, water_budget)))
     waste_ratio = min(1.0, waste_diverted / max(0.1, waste_budget * 0.5))
+    action_bonus = min(10.0, (current_points / 1500.0) * 10.0)
 
-    calculated_score = (carbon_ratio * 45.0) + (water_ratio * 35.0) + (waste_ratio * 20.0)
+    calculated_score = (carbon_ratio * 40.0) + (water_ratio * 30.0) + (waste_ratio * 20.0) + action_bonus
     planet_score = min(100.0, max(0.0, round(calculated_score, 1)))
 
     # Forecast overshoot estimation

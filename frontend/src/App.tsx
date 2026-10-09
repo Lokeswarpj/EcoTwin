@@ -12,6 +12,10 @@ import { ScannerModal } from './components/modals/ScannerModal';
 import { AutopilotModal } from './components/modals/AutopilotModal';
 import { LocationModal } from './components/modals/LocationModal';
 import { HistoryModal } from './components/modals/HistoryModal';
+import { DigitalTwinSimulatorModal } from './components/simulator/DigitalTwinSimulatorModal';
+import { CircularDropOffModal } from './components/map/CircularDropOffModal';
+import { VoiceCopilotModal } from './components/voice/VoiceCopilotModal';
+import { ImpactCertificateModal } from './components/certificate/ImpactCertificateModal';
 import { Footer } from './components/layout/Footer';
 import { fetchDashboard, toggleActionStep, analyzeMedia } from './services/api';
 import { DashboardResponse, ActionCard, TraceItem } from './types';
@@ -19,8 +23,8 @@ import { LanguageCode } from './i18n/translations';
 import { Sparkles } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const [city, setCity] = useState<string>('Delhi');
-  const [language, setLanguage] = useState<LanguageCode>('dual');
+  const [city, setCity] = useState<string>('Bengaluru');
+  const [language, setLanguage] = useState<LanguageCode>('en');
   const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(null);
   const [actions, setActions] = useState<ActionCard[]>([]);
   const [agentTrace, setAgentTrace] = useState<TraceItem[]>([]);
@@ -31,6 +35,10 @@ export const App: React.FC = () => {
   const [autopilotOpen, setAutopilotOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [simulatorOpen, setSimulatorOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
+  const [certOpen, setCertOpen] = useState(false);
 
   const loadData = async (selectedCity = city) => {
     try {
@@ -81,34 +89,70 @@ export const App: React.FC = () => {
     }
   };
 
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const handleAnalysisSuccess = (newAction: ActionCard, trace: TraceItem[]) => {
+    setIsAnalyzing(false);
     setActions((prev) => [newAction, ...prev]);
     setAgentTrace(trace);
     showNotification('AI Agent Audit Complete', `New action card: ${newAction.title} created!`);
     loadData(city);
-    document.getElementById('action-stream-section')?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      document.getElementById('action-stream-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   const handleUploadFileScanner = async (file: File) => {
     setScannerOpen(false);
+    setIsAnalyzing(true);
     try {
-      showNotification('Analyzing Photo...', 'Gemini Vision AI is identifying material layers and calculating footprint.');
+      showNotification('Analyzing Photo with Gemini AI...', 'Identifying material polymers, carbon footprint, and local recycling rules.');
       const res = await analyzeMedia('waste', file, undefined, city);
       handleAnalysisSuccess(res.action_card, res.trace);
     } catch (e) {
       console.error(e);
+      setIsAnalyzing(false);
       showNotification('Analysis Error', 'Could not complete scan. Please try again.');
     }
   };
 
   const handleSimulateCapture = async () => {
     setScannerOpen(false);
+    setIsAnalyzing(true);
     try {
       showNotification('Running AI Planetary Audit...', 'Auditing Tetra Pak packaging sample.');
       const res = await analyzeMedia('waste', null, 'Tetra Pak Milk Carton dry packaging', city);
       handleAnalysisSuccess(res.action_card, res.trace);
     } catch (e) {
       console.error(e);
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleUploadBillScanner = async (file: File) => {
+    setScannerOpen(false);
+    setIsAnalyzing(true);
+    try {
+      showNotification('Auditing Utility / Grocery Bill...', 'Gemini OCR extracting tariffs, line-item footprints, and instant greener swaps.');
+      const res = await analyzeMedia('bill', file, undefined, city);
+      handleAnalysisSuccess(res.action_card, res.trace);
+    } catch (e) {
+      console.error(e);
+      setIsAnalyzing(false);
+      showNotification('Bill Audit Error', 'Could not process bill. Please try again.');
+    }
+  };
+
+  const handleSimulateBill = async () => {
+    setScannerOpen(false);
+    setIsAnalyzing(true);
+    try {
+      showNotification('Auditing BESCOM Power Statement...', 'Extracting 340 kWh consumption & peak thermal coal emission tiers.');
+      const res = await analyzeMedia('bill', null, 'BESCOM 340 kWh monthly bill', city);
+      handleAnalysisSuccess(res.action_card, res.trace);
+    } catch (e) {
+      console.error(e);
+      setIsAnalyzing(false);
     }
   };
 
@@ -116,6 +160,16 @@ export const App: React.FC = () => {
     <div className="min-h-screen relative selection:bg-white/20">
       {/* Dynamic Celestial Background Canvas & Parallax */}
       <CelestialCanvas />
+
+      {/* Floating Global Analyzing HUD */}
+      {isAnalyzing && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 glass-card px-6 py-3 rounded-full border border-cyan-400/50 shadow-2xl flex items-center gap-3 bg-black/80 backdrop-blur-xl animate-pulse">
+          <div className="w-3 h-3 rounded-full bg-cyan-400 animate-ping" />
+          <span className="text-sm font-medium text-cyan-200">
+            Gemini Vision AI: Auditing footprint &amp; calculating municipal rules...
+          </span>
+        </div>
+      )}
 
       {/* Floating Toast Notification */}
       {toastMsg && (
@@ -137,6 +191,10 @@ export const App: React.FC = () => {
         onOpenLocation={() => setLocationOpen(true)}
         onOpenAutopilot={() => setAutopilotOpen(true)}
         onSelectLanguage={(l) => setLanguage(l)}
+        onOpenSimulator={() => setSimulatorOpen(true)}
+        onOpenMap={() => setMapOpen(true)}
+        onOpenVoice={() => setVoiceOpen(true)}
+        onOpenCertificate={() => setCertOpen(true)}
       />
 
       {/* Main Container */}
@@ -149,7 +207,7 @@ export const App: React.FC = () => {
           onViewDemo={() => setAutopilotOpen(true)}
         />
 
-        {/* Dashboard Grid: Uploader & Stats + Score & Solar Panel */}
+        {/* Dashboard Grid: Uploader & Stats + Solar & Score */}
         <div className="grid lg:grid-cols-12 gap-8 mb-20">
           <section className="lg:col-span-8 space-y-8">
             <UploadHub
@@ -159,11 +217,11 @@ export const App: React.FC = () => {
               onOpenScanner={() => setScannerOpen(true)}
             />
             <MetricCards metrics={dashboardData?.metrics} language={language} city={city} />
+            <SolarPanel city={city} />
           </section>
 
           <aside className="lg:col-span-4 space-y-8">
             <ScoreGauge metrics={dashboardData?.metrics} />
-            <SolarPanel city={city} />
           </aside>
         </div>
 
@@ -189,6 +247,8 @@ export const App: React.FC = () => {
         onClose={() => setScannerOpen(false)}
         onUploadFile={handleUploadFileScanner}
         onSimulateCapture={handleSimulateCapture}
+        onUploadBill={handleUploadBillScanner}
+        onSimulateBill={handleSimulateBill}
       />
       <AutopilotModal
         isOpen={autopilotOpen}
@@ -211,6 +271,34 @@ export const App: React.FC = () => {
       <HistoryModal
         isOpen={historyOpen}
         onClose={() => setHistoryOpen(false)}
+      />
+      <DigitalTwinSimulatorModal
+        isOpen={simulatorOpen}
+        onClose={() => setSimulatorOpen(false)}
+        currentPlanetScore={dashboardData?.metrics?.planet_score || 78.5}
+        onApplyToAutopilot={(settings) => {
+          showNotification('Digital Twin Settings Applied', 'Monthly autopilot budget updated with your new lifestyle targets.');
+          loadData(city);
+        }}
+      />
+      <CircularDropOffModal
+        isOpen={mapOpen}
+        city={city}
+        onClose={() => setMapOpen(false)}
+      />
+      <VoiceCopilotModal
+        isOpen={voiceOpen}
+        city={city}
+        onClose={() => setVoiceOpen(false)}
+        onActionCreated={(newAction, trace) => {
+          handleAnalysisSuccess(newAction, trace);
+        }}
+      />
+      <ImpactCertificateModal
+        isOpen={certOpen}
+        dashboardData={dashboardData}
+        city={city}
+        onClose={() => setCertOpen(false)}
       />
     </div>
   );

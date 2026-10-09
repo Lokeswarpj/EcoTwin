@@ -33,7 +33,7 @@ export async function toggleActionStep(actionId: string, stepIdx: number, done: 
 }
 
 export async function analyzeMedia(
-  type: 'waste' | 'food' | 'energy' | 'mobility',
+  type: 'waste' | 'food' | 'energy' | 'mobility' | 'bill',
   file?: File | null,
   text?: string,
   city: string = 'Bengaluru'
@@ -48,6 +48,19 @@ export async function analyzeMedia(
     body: formData
   });
   if (!res.ok) throw new Error(`Analysis failed for ${type}`);
+  return res.json();
+}
+
+export async function sendVoiceCommand(transcript: string, city: string = 'Bengaluru'): Promise<AnalyzeResult> {
+  const formData = new FormData();
+  formData.append('voice_transcript', transcript);
+  formData.append('city', city);
+
+  const res = await fetch(`${API_BASE}/analyze/voice`, {
+    method: 'POST',
+    body: formData
+  });
+  if (!res.ok) throw new Error('Voice command execution failed');
   return res.json();
 }
 

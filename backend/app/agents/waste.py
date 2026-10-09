@@ -68,20 +68,33 @@ Return JSON with:
     # Verified Realistic Fallback (Demo Mode)
     # Detect if user mentioned another item (e.g., plastic bottle, battery, bioplastic)
     t = (input_text or "").lower()
-    if "bottle" in t or "pet" in t:
+    if "bottle" in t or "pet" in t or "plastic" in t:
         item_name = "PET Beverage Bottle"
         material = "Polyethylene Terephthalate (#1 PET)"
         mass = 0.045
         co2_saved, assumption = calculate_waste_diversion("pet_plastic", mass)
         steps = ["Remove cap & rinse residual liquid", "Crush bottle to minimize collection volume", "Place in dry recyclables bin"]
         rules = "BBMP Plastic Waste Management Bye-Laws & Authorized Recyclers"
-    elif "battery" in t or "electronic" in t:
-        item_name = "Lithium-ion Battery Pack"
-        material = "Lithium cobalt oxide / Nickel manganese"
+        category = "Dry Waste"
+        action = "RECYCLE"
+    elif any(k in t for k in ["phone", "mobile", "smartphone", "screen", "tablet", "device"]):
+        item_name = "Old Mobile Phone (Smartphone E-Waste)"
+        material = "Lithium Battery, Printed Circuit Board (Gold/Copper/Silicon), Gorilla Glass"
+        mass = 0.18
+        co2_saved, assumption = calculate_waste_diversion("e_waste", mass)
+        steps = ["Back up and factory reset personal data", "Remove SIM & memory cards", "Drop at CPCB Authorized E-Waste kiosk (e.g. Croma / Hasiru Dala)"]
+        rules = "CPCB E-Waste Management Rules 2022 (Extended Producer Responsibility)"
+        category = "E-Waste / Hazardous"
+        action = "E_WASTE"
+    elif "battery" in t or "electronic" in t or "charger" in t:
+        item_name = "Lithium-ion Battery Pack / Charger"
+        material = "Lithium cobalt oxide / Copper wiring"
         mass = 0.08
         co2_saved, assumption = calculate_waste_diversion("e_waste", mass)
         steps = ["Tape battery terminals with electrical tape", "Do NOT puncture or mix with wet waste", "Deposit at designated E-Waste collection box"]
         rules = "CPCB E-Waste Management Rules 2022 (Hazardous Stream)"
+        category = "E-Waste / Hazardous"
+        action = "E_WASTE"
     else:
         item_name = "Tetra Pak Carton (Milk/Juice)"
         material = "Aseptic Composite: 75% Paperboard, 20% LDPE, 5% Aluminium"
@@ -89,16 +102,18 @@ Return JSON with:
         co2_saved, assumption = calculate_waste_diversion("tetra_pak", mass)
         steps = ["Rinse thoroughly to prevent odor", "Flatten the carton flat", "Drop in Dry Waste bin for Hasiru Dala pulping"]
         rules = "BBMP Solid Waste Management Protocol & Tetra Pak India Circular Network"
+        category = "Dry Waste"
+        action = "RECYCLE"
 
     analysis = WasteAnalysis(
         item_name=item_name,
         material=material,
         condition="Clean and segregated",
-        recommended_action="RECYCLE" if "battery" not in t else "E_WASTE",
+        recommended_action=action,
         confidence=0.96,
-        explanation="High density polyethylene coating and composite fibers require specialized hydrapulper separation.",
+        explanation=f"Identified {item_name} composition. Process according to {rules}.",
         preparation_steps=steps,
-        disposal_category="Dry Waste" if "battery" not in t else "E-Waste / Hazardous",
+        disposal_category=category,
         estimated_mass_kg=mass,
         landfill_diversion_kg=mass,
         co2e_saving_kg=co2_saved,
