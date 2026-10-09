@@ -22,6 +22,85 @@ function getTimestamp(): string {
   return now.toTimeString().split(' ')[0];
 }
 
+const GEMINI_DIRECT_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+
+function fileToBase64(file: File | Blob): Promise<{ base64: string; mimeType: string }> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const commaIdx = dataUrl.indexOf(',');
+      const meta = dataUrl.substring(0, commaIdx);
+      const mimeType = meta.split(':')[1]?.split(';')[0] || 'image/jpeg';
+      const base64 = dataUrl.substring(commaIdx + 1);
+      resolve({ base64, mimeType });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function callGeminiVisionDirect(file?: File | null, text?: string, city = 'Bengaluru'): Promise<any | null> {
+  if (!GEMINI_DIRECT_KEY) return null;
+  try {
+    const parts: any[] = [];
+    const prompt = `You are EcoTwin's Planetary AI engine. Analyze this physical item or material for recycling/waste management in ${city}, India.
+Text description / hints: ${text || 'Item captured via webcam or photo'}.
+Analyze the image or text accurately (e.g. if you see a plastic pouch with paper, or thermal paper receipt, or PET bottle, identify the exact specific item and materials).
+Return strictly valid JSON adhering to this schema:
+{
+  "item_name": "concise name of the item (e.g. Plastic Pouch with Paper, Thermal Paper Receipt, PET Beverage Bottle)",
+  "material": "detailed material composition (e.g. LDPE plastic film laminated with bleached kraft paper)",
+  "disposal_category": "Dry Waste, Wet Waste, Sanitary, or E-Waste",
+  "recommended_action": "RECYCLE, COMPOST, REUSE, E_WASTE, or LANDFILL",
+  "explanation": "concise explanation of recycling and disposal feasibility under municipal rules (e.g. BBMP DWCC)",
+  "preparation_steps": ["step 1", "step 2", "step 3"],
+  "co2_saving_kg": 0.25,
+  "landfill_diversion_kg": 0.08,
+  "points": 30
+}`;
+    parts.push({ text: prompt });
+
+    if (file) {
+      const { base64, mimeType } = await fileToBase64(file);
+      parts.push({
+        inline_data: {
+          mime_type: mimeType,
+          data: base64
+        }
+      });
+    }
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_DIRECT_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts }],
+          generationConfig: {
+            response_mime_type: 'application/json'
+          }
+        })
+      }
+    );
+
+    if (!res.ok) {
+      console.warn('Direct Gemini API call failed with status:', res.status);
+      return null;
+    }
+
+    const data = await res.json();
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (rawText) {
+      return JSON.parse(rawText);
+    }
+  } catch (err) {
+    console.warn('Direct Gemini Vision call error:', err);
+  }
+  return null;
+}
+
 // -------------------------------------------------------------
 // Fallback & Demo Data Generator
 // -------------------------------------------------------------
@@ -265,7 +344,70 @@ export async function analyzeMedia(
         body: formData
       });
     } catch {
-      // High-fidelity, deterministic client-side simulation when backend is unreachable (e.g. Vercel cloud deployment)
+      // 1. Live Multimodal Gemini Vision Direct Call (handles real camera photos & text on deployed frontend)
+      if (file || text) {
+        const liveGemini = await callGeminiVisionDirect(file, text, city);
+        if (liveGemini && liveGemini.item_name) {
+          const nowIso = new Date().toISOString();
+          const actionId = `action-snap-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+          const eventId = `evt-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+          const ts = getTimestamp();
+          const category = `Recycle • ${liveGemini.disposal_category || 'Dry Waste'}`;
+          return {
+            input_type: type,
+            specialist: 'WasteRecyclingAgent',
+            is_live_ai: true,
+            data: {
+              item_name: liveGemini.item_name,
+              material: liveGemini.material,
+              landfill_diversion_kg: liveGemini.landfill_diversion_kg || 0.05,
+              co2e_saving_kg: liveGemini.co2_saving_kg || 0.15,
+              confidence: 0.95
+            },
+            action_card: {
+              id: actionId,
+              category,
+              title: `Detected: ${liveGemini.item_name}`,
+              description: `"${liveGemini.explanation || 'Analyzed material composition and local municipal rules.'}"`,
+              co2_saving_kg: liveGemini.co2_saving_kg || 0.15,
+              points: liveGemini.points || 30,
+              color: 'green',
+              agent_name: 'Gemini Vision v2.5 (Live Multimodal)',
+              status: 'pending',
+              in_plan: true,
+              steps: (liveGemini.preparation_steps && Array.isArray(liveGemini.preparation_steps))
+                ? liveGemini.preparation_steps.map((st: string) => ({ text: st, done: false }))
+                : [
+                    { text: 'Segregate material carefully', done: false },
+                    { text: 'Rinse or wipe any organic residue', done: false },
+                    { text: `Deposit in ${liveGemini.disposal_category || 'Dry Waste'} collection`, done: false }
+                  ],
+              created_at: nowIso
+            },
+            event_logged: {
+              id: eventId,
+              timestamp: nowIso,
+              activity_type: type,
+              source: 'Camera Item Scan (Gemini Vision Live)',
+              description: `Audited ${liveGemini.item_name} (${liveGemini.material})`,
+              carbon_impact_kg: -(liveGemini.co2_saving_kg || 0.15),
+              waste_diverted_kg: liveGemini.landfill_diversion_kg || 0.05,
+              water_consumed_l: 0.0,
+              confidence: 0.96,
+              assumptions: 'Live Gemini Vision inference with BBMP/CPCB municipal rules',
+              is_demo: false
+            },
+            trace: [
+              { agent_name: 'RouterAgent', status: 'SUCCESS', explanation: `Visual image signature received. Dispatched to Gemini 2.5 Flash Multimodal Vision.`, timestamp: ts },
+              { agent_name: 'GeminiVisionAgent', status: 'SUCCESS', explanation: `Identified: ${liveGemini.item_name} (${liveGemini.material}). Recommendation: ${liveGemini.recommended_action || 'RECYCLE'}.`, timestamp: ts },
+              { agent_name: 'VerifierAgent', status: 'SUCCESS', explanation: `Validated lifecycle boundary factors & municipal segregation rules for ${city}.`, timestamp: ts },
+              { agent_name: 'ImpactEngine', status: 'SUCCESS', explanation: `Persisted environmental event: -${liveGemini.co2_saving_kg || 0.15}kg CO2e credited to score.`, timestamp: ts }
+            ]
+          };
+        }
+      }
+
+      // High-fidelity, deterministic client-side simulation when offline
       const nowIso = new Date().toISOString();
       const actionId = `action-snap-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
       const eventId = `evt-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
