@@ -1,0 +1,40 @@
+{
+  "cities": {
+    "Bengaluru": {
+      "state": "Karnataka",
+      "country": "India",
+      "latitude": 12.9716,
+      "longitude": 77.5946,
+      "peak_sun_hours_per_day": 5.4,
+      "performance_ratio": 0.76,
+      "grid_tariff_inr_per_kwh": 7.5,
+      "grid_emission_factor_kg_co2_kwh": 0.76,
+      "installed_cost_per_kw_inr": 48000,
+      "subsidy_pm_surya_ghar_inr_kw": 18000
+    },
+    "Mumbai": {
+      "state": "Maharashtra",
+      "country": "India",
+      "latitude": 19.0760,
+      "longitude": 72.8777,
+      "peak_sun_hours_per_day": 5.1,
+      "performance_ratio": 0.74,
+      "grid_tariff_inr_per_kwh": 8.4,
+      "grid_emission_factor_kg_co2_kwh": 0.82,
+      "installed_cost_per_kw_inr": 50000,
+      "subsidy_pm_surya_ghar_inr_kw": 18000
+    },
+    "Delhi": {
+      "state": "Delhi",
+      "country": "India",
+      "latitude": 28.6139,
+      "longitude": 77.2090,
+      "peak_sun_hours_per_day": 5.2,
+      "performance_ratio": 0.73,
+      "grid_tariff_inr_per_kwh": 7.2,
+      "grid_emission_factor_kg_co2_kwh": 0.85,
+      "installed_cost_per_kw_inr": 48000,
+      "subsidy_pm_surya_ghar_inr_kw": 18000
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "ecotwin",
+  "version": "1.0.0",
+  "description": "EcoTwin — AI Planet Budget Platform",
+  "scripts": {
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "test:backend": "powershell -Command \"cd backend; .\\.venv\\Scripts\\pytest tests\\test_ecotwin.py -v\""
+  },
+  "keywords": [
+    "ecotwin",
+    "planet-budget",
+    "gemini",
+    "fastapi",
+    "react"
+  ],
+  "author": "EcoTwin Team",
+  "license": "MIT"
+}

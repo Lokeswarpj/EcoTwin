@@ -1,0 +1,25 @@
+# Environment and Secrets
+.env
+*.env
+backend/.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+backend/.venv/
+.pytest_cache/
+
+# Databases
+*.db
+ecotwin.db
+backend/ecotwin.db
+
+# Node / Vite
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+.tmp/
+*.tsbuildinfo

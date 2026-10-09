@@ -1,0 +1,116 @@
+{
+  "electricity": {
+    "in_grid_average": {
+      "factor": 0.82,
+      "unit": "kg CO2e / kWh",
+      "source": "CEA India CO2 Baseline Database v19 (2024)",
+      "description": "Average Indian grid emission factor"
+    },
+    "bescom_karnataka": {
+      "factor": 0.76,
+      "unit": "kg CO2e / kWh",
+      "source": "KERC / BESCOM Power Procurement Portfolio 2024",
+      "description": "Karnataka grid with renewable mix"
+    }
+  },
+  "transport": {
+    "car_petrol": {
+      "factor": 0.192,
+      "unit": "kg CO2e / km",
+      "source": "ARAI / India GHG Program",
+      "description": "Average petrol hatchback/sedan"
+    },
+    "car_diesel": {
+      "factor": 0.171,
+      "unit": "kg CO2e / km",
+      "source": "India GHG Program",
+      "description": "Diesel compact car"
+    },
+    "two_wheeler_petrol": {
+      "factor": 0.045,
+      "unit": "kg CO2e / km",
+      "source": "ARAI standard urban cycle",
+      "description": "Motorcycle / Scooter"
+    },
+    "two_wheeler_ev": {
+      "factor": 0.015,
+      "unit": "kg CO2e / km",
+      "source": "CEA Grid powered EV",
+      "description": "Electric Scooter (Ather/Ola)"
+    },
+    "bus_bmtc": {
+      "factor": 0.028,
+      "unit": "kg CO2e / passenger-km",
+      "source": "BMTC Sustainability Review",
+      "description": "Public transit city bus"
+    },
+    "metro_namma": {
+      "factor": 0.014,
+      "unit": "kg CO2e / passenger-km",
+      "source": "BMRCL Environmental Impact Assessment",
+      "description": "Namma Metro electric rail"
+    },
+    "walking": {
+      "factor": 0.0,
+      "unit": "kg CO2e / km",
+      "source": "Zero emission active transit",
+      "description": "Pedestrian walking"
+    },
+    "bicycle": {
+      "factor": 0.0,
+      "unit": "kg CO2e / km",
+      "source": "Zero direct emission",
+      "description": "Bicycle commute"
+    }
+  },
+  "waste": {
+    "tetra_pak": {
+      "recyclable": true,
+      "landfill_factor": 1.25,
+      "diverted_saving": 0.95,
+      "unit": "kg CO2e / kg material",
+      "source": "Tetra Pak Circularity Life Cycle Inventory",
+      "notes": "Composite carton 75% paperboard, 20% polymer, 5% aluminium"
+    },
+    "pet_plastic": {
+      "recyclable": true,
+      "landfill_factor": 2.15,
+      "diverted_saving": 1.60,
+      "unit": "kg CO2e / kg material",
+      "source": "Plastics Europe Eco-profile",
+      "notes": "Polyethylene Terephthalate bottles"
+    },
+    "hdpe_plastic": {
+      "recyclable": true,
+      "landfill_factor": 1.90,
+      "diverted_saving": 1.45,
+      "unit": "kg CO2e / kg material",
+      "source": "WRAP UK Material Factsheet",
+      "notes": "Milk jugs, detergent bottles"
+    },
+    "organic_food_waste": {
+      "recyclable": true,
+      "landfill_factor": 1.80,
+      "diverted_saving": 1.50,
+      "unit": "kg CO2e / kg food (methane avoidance)",
+      "source": "IPCC Waste Model (Anaerobic degradation)",
+      "notes": "Composting eliminates anaerobic methane formation"
+    },
+    "e_waste": {
+      "recyclable": true,
+      "landfill_factor": 8.50,
+      "diverted_saving": 6.80,
+      "unit": "kg CO2e / kg e-waste",
+      "source": "CPCB E-Waste Management Rules 2022",
+      "notes": "Recovery of precious metals and toxic element containment"
+    }
+  },
+  "water": {
+    "municipal_tap": {
+      "factor": 0.00038,
+      "unit": "kg CO2e / Litre",
+      "source": "BWSSB Cauvery Water Pumping Energy Benchmark",
+      "description": "Cauvery Stage IV pumping over 100km to Bengaluru elevation"
+    }
+  }
+}

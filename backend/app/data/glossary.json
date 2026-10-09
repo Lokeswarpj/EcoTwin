@@ -1,0 +1,50 @@
+{
+  "languages": ["en", "hi", "kn"],
+  "terms": {
+    "planet_budget": {
+      "en": "Planet Budget",
+      "hi": "प्लैनेट बजट (ग्रह बजट)",
+      "kn": "ಗ್ರಹದ ಬಜೆಟ್ (Planet Budget)"
+    },
+    "carbon_emissions": {
+      "en": "Carbon Emissions",
+      "hi": "कार्बन उत्सर्जन",
+      "kn": "ಇಂಗಾಲದ ಹೊರಸೂಸುವಿಕೆ"
+    },
+    "landfill_waste": {
+      "en": "Landfill Waste",
+      "hi": "लैंडफिल कचरा",
+      "kn": "ತ್ಯಾಜ್ಯ ವಿಲೇವಾರಿ"
+    },
+    "water_consumption": {
+      "en": "Water Consumed",
+      "hi": "जल खपत",
+      "kn": "ನೀರಿನ ಬಳಕೆ"
+    },
+    "launch_autopilot": {
+      "en": "Launch Autopilot",
+      "hi": "ऑटोपायलट शुरू करें",
+      "kn": "ಆಟೋಪೈಲಟ್ ಪ್ರಾರಂಭಿಸಿ"
+    },
+    "snap_and_scan": {
+      "en": "Snap & Scan Item",
+      "hi": "फोटो खींचें और स्कैन करें",
+      "kn": "ಫೋಟೋ ತೆಗೆದು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ"
+    },
+    "solar_energy_panel": {
+      "en": "Solar & Energy Panel",
+      "hi": "सौर और ऊर्जा पैनल",
+      "kn": "ಸೌರ ಮತ್ತು ಶಕ್ತಿ ಪ್ಯಾನೆಲ್"
+    },
+    "ai_action_stream": {
+      "en": "AI Action Stream",
+      "hi": "एआई एक्शन स्ट्रीम",
+      "kn": "ಎಐ ಕ್ರಿಯೆಯ ಸ್ಟ್ರೀಮ್"
+    },
+    "planet_score": {
+      "en": "Planet Score",
+      "hi": "प्लैनेट स्कोर",
+      "kn": "ಪ್ಲಾನೆಟ್ ಸ್ಕೋರ್"
+    }
+  }
+}

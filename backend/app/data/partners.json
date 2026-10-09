@@ -1,0 +1,37 @@
+{
+  "partners": [
+    {
+      "id": "p-hasiru-dala",
+      "name": "Hasiru Dala (Green Force)",
+      "category": "Dry Waste & E-Waste Segregation",
+      "city": "Bengaluru",
+      "neighborhood": "Ulsoor / Indiranagar / Koramangala",
+      "type": "Authorized Dry Waste Collection Centre (DWCC)",
+      "accepted_materials": ["Tetra Pak", "Cardboard", "Plastics (PET, HDPE, MLP)", "E-waste"],
+      "contact": "support@hasirudala.in",
+      "demo_label": "Verified Bengaluru Partner (Official BBM P/BBMP DWCC Network)"
+    },
+    {
+      "id": "p-saahas",
+      "name": "Saahas Zero Waste Hub",
+      "category": "Circular Textile & Food Composting",
+      "city": "Bengaluru",
+      "neighborhood": "Whitefield & Bellandur",
+      "type": "Decentralized Resource Recovery Facility",
+      "accepted_materials": ["Worn Clothes", "Footwear", "Tetra Pak", "Electronics"],
+      "contact": "contact@saahaszerowaste.com",
+      "demo_label": "Verified Bengaluru Partner"
+    },
+    {
+      "id": "p-goonj",
+      "name": "Goonj Bengaluru Collection Centre",
+      "category": "Clothing Donation & Reuse",
+      "city": "Bengaluru",
+      "neighborhood": "Hosur Main Road, Kudlu Gate",
+      "type": "Material Re-use & Rural Distribution",
+      "accepted_materials": ["Usable Clothes", "Woolens", "Utensils", "Footwear"],
+      "contact": "bangalore@goonj.org",
+      "demo_label": "National Circular Reuse Network"
+    }
+  ]
+}

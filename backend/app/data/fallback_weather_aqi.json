@@ -1,0 +1,41 @@
+{
+  "Bengaluru": {
+    "temperature_c": 24.2,
+    "condition": "Partly Cloudy",
+    "humidity_pct": 58,
+    "wind_speed_kmh": 12.5,
+    "aqi": 72,
+    "aqi_category": "Moderate",
+    "dominant_pollutant": "PM2.5",
+    "pm25_ug_m3": 22.4,
+    "source": "Open-Meteo Air Quality & CPCB Bengaluru Central (Cached Fallback)",
+    "recommendation": "Mild weather. Outdoor commute via active transit or Namma Metro recommended.",
+    "last_updated": "2026-10-09T09:30:00Z"
+  },
+  "Mumbai": {
+    "temperature_c": 29.5,
+    "condition": "Humid / Haze",
+    "humidity_pct": 74,
+    "wind_speed_kmh": 16.0,
+    "aqi": 118,
+    "aqi_category": "Poor",
+    "dominant_pollutant": "PM10",
+    "pm25_ug_m3": 44.1,
+    "source": "Open-Meteo Air Quality (Cached Fallback)",
+    "recommendation": "Consider electric train or metro during high humidity peaks.",
+    "last_updated": "2026-10-09T09:30:00Z"
+  },
+  "Delhi": {
+    "temperature_c": 26.8,
+    "condition": "Hazy",
+    "humidity_pct": 48,
+    "wind_speed_kmh": 8.0,
+    "aqi": 184,
+    "aqi_category": "Unhealthy for Sensitive Groups",
+    "dominant_pollutant": "PM2.5",
+    "pm25_ug_m3": 78.5,
+    "source": "Open-Meteo Air Quality (Cached Fallback)",
+    "recommendation": "High particulate count. Prefer closed AC metro transit and avoid peak road idling.",
+    "last_updated": "2026-10-09T09:30:00Z"
+  }
+}
