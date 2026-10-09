@@ -405,8 +405,21 @@ export async function analyzeMedia(
       };
     }
 
-    // Default: 'waste' photo scan (matches user snapshot)
+    // Default: 'waste' photo scan
     const scannedItems = [
+      {
+        name: 'Thermal Paper Receipt',
+        material: 'Paper coated with thermal dyes and chemicals (BPA / BPS)',
+        co2: 0.00,
+        waste: 0.01,
+        pts: 15,
+        explanation: 'Thermal paper receipts are coated with reactive heat-sensitive chemicals (BPA/BPS) that contaminate the paper recycling pulp and cannot be recycled into new paper. They must be sent to landfill or non-recyclable dry waste.',
+        steps: [
+          { text: 'Do not mix with normal paper, newspapers, or cardboard pulp', done: false },
+          { text: 'Place in designated Non-Recyclable Dry Waste stream for landfill', done: false },
+          { text: 'Opt for digital e-receipts / SMS invoices whenever available', done: false }
+        ]
+      },
       {
         name: 'Tetra Pak Multi-Layer Packaging',
         material: 'Paperboard (75%) + Polyethylene (20%) + Aluminum Foil (5%)',
@@ -445,11 +458,38 @@ export async function analyzeMedia(
           { text: 'Flatten cardboard box flat and bundle dry', done: false },
           { text: 'Hand over to local Kabadiwala / Hasiru Dala recycling aggregator', done: false }
         ]
+      },
+      {
+        name: 'Aluminium Beverage Can',
+        material: 'Aluminium Alloy 3104 / 5182',
+        co2: 0.62,
+        waste: 0.08,
+        pts: 40,
+        explanation: 'Infinitely recyclable non-ferrous metal. Remelting recycled aluminum requires 95% less energy than refining bauxite ore.',
+        steps: [
+          { text: 'Rinse out soda residue and allow to dry', done: false },
+          { text: 'Crush can vertically to conserve collection space', done: false },
+          { text: 'Segregate with clean metal dry recyclables', done: false }
+        ]
       }
     ];
 
-    // Pick item based on query text or cycle smoothly
-    const selected = scannedItems[Math.floor(Math.random() * scannedItems.length)];
+    // Smart matching based on uploaded filename or input text
+    const searchTarget = `${text || ''} ${file?.name || ''}`.toLowerCase();
+    let selected = scannedItems[0];
+    if (searchTarget.includes('thermal') || searchTarget.includes('receipt') || searchTarget.includes('slip') || searchTarget.includes('bill') || searchTarget.includes('paper')) {
+      selected = scannedItems.find((s) => s.name.includes('Thermal')) || scannedItems[0];
+    } else if (searchTarget.includes('bottle') || searchTarget.includes('pet') || searchTarget.includes('plastic')) {
+      selected = scannedItems.find((s) => s.name.includes('PET')) || scannedItems[0];
+    } else if (searchTarget.includes('box') || searchTarget.includes('cardboard') || (searchTarget.includes('carton') && !searchTarget.includes('tetra'))) {
+      selected = scannedItems.find((s) => s.name.includes('Cardboard')) || scannedItems[0];
+    } else if (searchTarget.includes('can') || searchTarget.includes('tin') || searchTarget.includes('aluminum') || searchTarget.includes('coke') || searchTarget.includes('soda')) {
+      selected = scannedItems.find((s) => s.name.includes('Aluminium')) || scannedItems[0];
+    } else if (searchTarget.includes('tetra') || searchTarget.includes('milk') || searchTarget.includes('juice')) {
+      selected = scannedItems.find((s) => s.name.includes('Tetra')) || scannedItems[0];
+    } else {
+      selected = scannedItems[Math.floor(Math.random() * scannedItems.length)];
+    }
 
     return {
       input_type: 'waste',

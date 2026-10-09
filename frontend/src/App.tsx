@@ -139,12 +139,23 @@ export const App: React.FC = () => {
     }
   };
 
+  const [sampleIdx, setSampleIdx] = useState(0);
+  const sampleItems = [
+    'Thermal Paper Receipt (BPA coated non-recyclable)',
+    'PET #1 Clear Beverage Bottle',
+    'Aluminium Soda Can',
+    'Tetra Pak Milk Carton dry packaging',
+    'Corrugated Cardboard Box'
+  ];
+
   const handleSimulateCapture = async () => {
     setScannerOpen(false);
     setIsAnalyzing(true);
+    const itemToAudit = sampleItems[sampleIdx % sampleItems.length];
+    setSampleIdx((prev) => prev + 1);
     try {
-      showNotification('Running AI Planetary Audit...', 'Auditing Tetra Pak packaging sample.');
-      const res = await analyzeMedia('waste', null, 'Tetra Pak Milk Carton dry packaging', city);
+      showNotification('Running AI Planetary Audit...', `Auditing sample: ${itemToAudit}`);
+      const res = await analyzeMedia('waste', null, itemToAudit, city);
       handleAnalysisSuccess(res.action_card, res.trace);
     } catch (e) {
       console.error(e);

@@ -86,6 +86,15 @@ Return JSON with:
         rules = "CPCB E-Waste Management Rules 2022 (Extended Producer Responsibility)"
         category = "E-Waste / Hazardous"
         action = "E_WASTE"
+    elif "thermal" in t or "receipt" in t or "bill" in t or "slip" in t:
+        item_name = "Thermal Paper Receipt"
+        material = "Paper coated with thermal dyes and BPA/BPS reactive chemicals"
+        mass = 0.005
+        co2_saved = 0.0
+        steps = ["Do not mix with recyclable paper pulp", "Discard in Non-Recyclable Dry Waste stream for landfill", "Opt for digital SMS/WhatsApp receipts"]
+        rules = "CPCB & BBMP Non-Recyclable Chemical Paper Waste Protocol"
+        category = "Non-Recyclable / Landfill"
+        action = "LANDFILL"
     elif "battery" in t or "electronic" in t or "charger" in t:
         item_name = "Lithium-ion Battery Pack / Charger"
         material = "Lithium cobalt oxide / Copper wiring"
