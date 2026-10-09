@@ -106,3 +106,14 @@ export interface AnalyzeResult {
   trace: TraceItem[];
   is_live_ai: boolean;
 }
+
+export interface WeeklyPlan {
+  week_id: string;
+  title: string;
+  summary: string;
+  projected_co2e_reduction_kg: number;
+  actions: ActionCard[];
+  context_notes: string;
+  trace: TraceItem[];
+}
+

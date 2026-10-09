@@ -1,4 +1,4 @@
-import { DashboardResponse, SolarSimulationResult, AnalyzeResult, ActionCard, EventItem, CityContext } from '../types';
+import { DashboardResponse, SolarSimulationResult, AnalyzeResult, ActionCard, EventItem, CityContext, WeeklyPlan } from '../types';
 
 const API_BASE = '/api';
 
@@ -51,7 +51,7 @@ export async function analyzeMedia(
   return res.json();
 }
 
-export async function generateWeeklyPlan(city: string = 'Bengaluru'): Promise<any> {
+export async function generateWeeklyPlan(city: string = 'Bengaluru'): Promise<WeeklyPlan> {
   const res = await fetch(`${API_BASE}/planner/generate?city=${encodeURIComponent(city)}`, {
     method: 'POST'
   });
