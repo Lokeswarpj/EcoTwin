@@ -102,7 +102,7 @@ export const DigitalTwinSimulatorModal: React.FC<DigitalTwinSimulatorModalProps>
 
         {/* Top Hero Projection Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-8">
-          <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-400/30 flex flex-col justify-between">
+          <div className="p-4 rounded-2xl bg-[#071326] border border-cyan-400/40 flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between text-xs text-cyan-300 font-medium mb-1">
               <span>Predicted Planet Score</span>
               <TrendingUp className="w-4 h-4 text-cyan-400" />
@@ -111,10 +111,10 @@ export const DigitalTwinSimulatorModal: React.FC<DigitalTwinSimulatorModalProps>
               <span className="text-2xl font-bold font-display text-white">{sim.newPlanetScore}</span>
               <span className="text-xs text-emerald-400 font-mono">+{sim.projectedBoost} pts</span>
             </div>
-            <span className="text-[10px] text-white/40 mt-1">From current {currentPlanetScore}</span>
+            <span className="text-[10px] text-white/50 mt-1">From current {currentPlanetScore}</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 flex flex-col justify-between">
+          <div className="p-4 rounded-2xl bg-[#061820] border border-emerald-400/40 flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between text-xs text-emerald-300 font-medium mb-1">
               <span>10-Yr Family Savings</span>
               <DollarSign className="w-4 h-4 text-emerald-400" />
@@ -125,7 +125,7 @@ export const DigitalTwinSimulatorModal: React.FC<DigitalTwinSimulatorModalProps>
             <span className="text-[10px] text-emerald-300/80 mt-1">₹{sim.annualRupeeSaved.toLocaleString('en-IN')}/yr saved</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-sky-500/10 border border-sky-400/30 flex flex-col justify-between">
+          <div className="p-4 rounded-2xl bg-[#071427] border border-sky-400/40 flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between text-xs text-sky-300 font-medium mb-1">
               <span>10-Yr Carbon Avoided</span>
               <ShieldCheck className="w-4 h-4 text-sky-400" />
@@ -134,10 +134,10 @@ export const DigitalTwinSimulatorModal: React.FC<DigitalTwinSimulatorModalProps>
               <span className="text-2xl font-bold font-display text-white">{sim.tenYearCo2SavedTons}t</span>
               <span className="text-xs text-sky-300">CO₂e</span>
             </div>
-            <span className="text-[10px] text-white/40 mt-1">{sim.annualCo2SavedKg.toLocaleString('en-IN')} kg / yr</span>
+            <span className="text-[10px] text-white/50 mt-1">{sim.annualCo2SavedKg.toLocaleString('en-IN')} kg / yr</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-400/30 flex flex-col justify-between">
+          <div className="p-4 rounded-2xl bg-[#1b1506] border border-amber-400/40 flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between text-xs text-amber-300 font-medium mb-1">
               <span>Offset Equivalence</span>
               <Trees className="w-4 h-4 text-amber-400" />
@@ -146,12 +146,12 @@ export const DigitalTwinSimulatorModal: React.FC<DigitalTwinSimulatorModalProps>
               <span className="text-2xl font-bold font-display text-white">{sim.treesEquivalent}</span>
               <span className="text-xs text-amber-300">Trees</span>
             </div>
-            <span className="text-[10px] text-white/40 mt-1">Forest canopy power</span>
+            <span className="text-[10px] text-white/50 mt-1">Forest canopy power</span>
           </div>
         </div>
 
         {/* Interactive Sliders Section */}
-        <div className="space-y-6 mb-8 bg-white/5 p-5 rounded-2xl border border-white/10">
+        <div className="space-y-6 mb-8 bg-[#050b17] p-5 rounded-2xl border border-white/15 shadow-xl">
           <h4 className="text-xs font-mono font-semibold text-white/50 uppercase tracking-wider">
             Personal Lifestyle Levers
           </h4>

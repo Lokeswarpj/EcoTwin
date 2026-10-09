@@ -65,7 +65,7 @@ export const ActionStream: React.FC<ActionStreamProps> = ({
           return (
             <div
               key={task.id}
-              className="glass-card p-6 lg:p-7 rounded-[32px] hover:translate-y-[-6px] transition-all duration-300 group flex flex-col justify-between border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.02] shadow-2xl relative overflow-hidden"
+              className="p-6 lg:p-7 rounded-[32px] hover:translate-y-[-6px] transition-all duration-300 group flex flex-col justify-between border border-white/15 bg-gradient-to-b from-[#0c162e]/94 via-[#081022]/96 to-[#050b18]/98 shadow-[0_16px_48px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden"
             >
               {/* Subtle Ambient Card Glow */}
               <div
@@ -94,13 +94,13 @@ export const ActionStream: React.FC<ActionStreamProps> = ({
                 </h4>
 
                 {/* Description Quote Box */}
-                <div className="bg-white/5 p-3.5 rounded-2xl border border-white/10 mb-5 text-sm text-slate-200/90 leading-relaxed font-normal">
+                <div className="bg-[#040915]/85 p-3.5 rounded-2xl border border-white/10 mb-5 text-sm text-slate-200 leading-relaxed font-normal">
                   {task.description}
                 </div>
 
                 {/* Custom Trade-off Card (Negotiator AI) */}
                 {task.trade_off && (
-                  <div className="bg-black/30 p-4 rounded-2xl space-y-2.5 mb-5 border border-white/10">
+                  <div className="bg-[#030712]/90 p-4 rounded-2xl space-y-2.5 mb-5 border border-amber-400/25">
                     <div className="flex justify-between text-[11px] font-mono text-white/50 uppercase tracking-wider">
                       <span>Transport Option</span>
                       <span>Est. Fare</span>
@@ -128,8 +128,8 @@ export const ActionStream: React.FC<ActionStreamProps> = ({
                       onClick={() => onToggleStep(task.id, idx, step.done)}
                       className={`flex items-start gap-3 text-xs lg:text-sm cursor-pointer select-none p-2.5 rounded-xl border transition-all ${
                         step.done
-                          ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-200'
-                          : 'bg-white/5 border-white/5 text-white/80 hover:text-white hover:bg-white/10 hover:border-white/15'
+                          ? 'bg-emerald-500/20 border-emerald-500/35 text-emerald-200'
+                          : 'bg-[#060c1a]/85 border-white/10 text-white/90 hover:text-white hover:bg-white/10 hover:border-white/20'
                       }`}
                     >
                       {step.done ? (

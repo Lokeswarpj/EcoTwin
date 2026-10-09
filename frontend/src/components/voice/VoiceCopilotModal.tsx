@@ -177,7 +177,7 @@ export const VoiceCopilotModal: React.FC<VoiceCopilotModalProps> = ({
 
         {/* Live Speech Transcription Box */}
         <div className="space-y-3 mb-6">
-          <div className="min-h-[70px] p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center text-sm text-white/90">
+          <div className="min-h-[70px] p-4 rounded-2xl bg-[#060c18] border border-white/15 flex items-center text-sm text-white/90 shadow-inner">
             {transcript ? (
               <span className="italic font-medium text-cyan-200">"{transcript}"</span>
             ) : (

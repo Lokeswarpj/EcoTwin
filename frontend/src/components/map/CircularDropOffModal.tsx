@@ -184,7 +184,7 @@ export const CircularDropOffModal: React.FC<CircularDropOffModalProps> = ({
             placeholder="Search by area (e.g. Indiranagar, HSR) or item (e.g. battery, PET bottle, laptop)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none focus:border-emerald-400/60"
+            className="w-full bg-[#050b18] border border-white/15 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none focus:border-emerald-400/60"
           />
 
           <div className="flex flex-wrap gap-2">
@@ -201,7 +201,7 @@ export const CircularDropOffModal: React.FC<CircularDropOffModalProps> = ({
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
                   selectedCategory === cat.id
                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 shadow-sm'
-                    : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/10'
+                    : 'bg-[#060c18] text-white/60 hover:text-white hover:bg-white/10 border border-white/10'
                 }`}
               >
                 {cat.label}
@@ -216,7 +216,7 @@ export const CircularDropOffModal: React.FC<CircularDropOffModalProps> = ({
             filteredCenters.map((center) => (
               <div
                 key={center.id}
-                className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-emerald-400/40 transition-all space-y-3"
+                className="p-5 rounded-2xl bg-[#060c18] border border-white/15 hover:border-emerald-400/40 transition-all space-y-3 shadow-md"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
