@@ -4,7 +4,6 @@ import { Navbar } from './components/layout/Navbar';
 import { Hero } from './components/dashboard/Hero';
 import { MetricCards } from './components/dashboard/MetricCards';
 import { ScoreGauge } from './components/dashboard/ScoreGauge';
-import { UploadHub } from './components/upload/UploadHub';
 import { SolarPanel } from './components/solar/SolarPanel';
 import { ActionStream } from './components/actions/ActionStream';
 import { AgentTraceDrawer } from './components/agents/AgentTraceDrawer';
@@ -207,15 +206,9 @@ export const App: React.FC = () => {
           onViewDemo={() => setAutopilotOpen(true)}
         />
 
-        {/* Dashboard Grid: Uploader & Stats + Solar & Score */}
+        {/* Dashboard Grid: Metrics & Solar + Score Gauge */}
         <div className="grid lg:grid-cols-12 gap-8 mb-20">
           <section className="lg:col-span-8 space-y-8">
-            <UploadHub
-              city={city}
-              language={language}
-              onAnalysisSuccess={handleAnalysisSuccess}
-              onOpenScanner={() => setScannerOpen(true)}
-            />
             <MetricCards metrics={dashboardData?.metrics} language={language} city={city} />
             <SolarPanel city={city} />
           </section>
