@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Award, Share2, Download, Check, Sparkles, ShieldCheck, QrCode, Copy, Globe, MessageSquare } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { DashboardResponse } from '../../types';
 
 interface ImpactCertificateModalProps {
@@ -17,6 +19,7 @@ export const ImpactCertificateModal: React.FC<ImpactCertificateModalProps> = ({
 }) => {
   const [userName, setUserName] = useState('EcoTwin Citizen');
   const [isCopied, setIsCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const certRef = useRef<HTMLDivElement | null>(null);
 
   if (!isOpen || !dashboardData) return null;
@@ -49,6 +52,166 @@ export const ImpactCertificateModal: React.FC<ImpactCertificateModalProps> = ({
     window.open(url, '_blank');
   };
 
+  const generateVectorPdfFallback = () => {
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4',
+    });
+    const w = pdf.internal.pageSize.getWidth();
+    const h = pdf.internal.pageSize.getHeight();
+
+    // Dark certificate background
+    pdf.setFillColor(9, 19, 34);
+    pdf.rect(0, 0, w, h, 'F');
+
+    // Outer double border
+    pdf.setDrawColor(251, 191, 36);
+    pdf.setLineWidth(1.5);
+    pdf.roundedRect(12, 12, w - 24, h - 24, 6, 6, 'D');
+
+    pdf.setDrawColor(251, 191, 36);
+    pdf.setLineWidth(0.5);
+    pdf.roundedRect(15, 15, w - 30, h - 30, 4, 4, 'D');
+
+    // Header badge
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(251, 191, 36);
+    pdf.text('VERIFIED PLANETARY LEDGER PROOF', w / 2, 30, { align: 'center' });
+
+    // Certificate Title
+    pdf.setFont('times', 'bold');
+    pdf.setFontSize(26);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text('CERTIFICATE OF CLIMATE ACTION', w / 2, 44, { align: 'center' });
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+    pdf.setTextColor(180, 195, 215);
+    pdf.text('Presented for excellence in sustainable urban living and verified resource stewardship.', w / 2, 53, { align: 'center' });
+
+    // Citizen Name
+    pdf.setFont('times', 'bold');
+    pdf.setFontSize(28);
+    pdf.setTextColor(253, 224, 71);
+    pdf.text(userName || 'EcoTwin Citizen', w / 2, 75, { align: 'center' });
+
+    pdf.setFont('helvetica', 'italic');
+    pdf.setFontSize(10);
+    pdf.setTextColor(140, 160, 185);
+    pdf.text(`Official Household Digital Twin Ledger — ${city}, India`, w / 2, 83, { align: 'center' });
+
+    // 4 Metrics Cards
+    const boxW = 55;
+    const boxH = 34;
+    const startX = (w - (boxW * 4 + 18)) / 2;
+    const boxY = 96;
+
+    const metricsData = [
+      { label: 'PLANET SCORE', val: `${score}`, sub: 'Verified Top 5%', color: [74, 222, 128] },
+      { label: 'CARBON AVOIDED', val: `${avoidedCo2} kg`, sub: 'CO2e Reduced', color: [110, 231, 183] },
+      { label: 'WASTE DIVERTED', val: `${wasteDiverted.toFixed(1)} kg`, sub: 'To Circular DWCC', color: [125, 211, 252] },
+      { label: 'ECO POINTS', val: `${points}`, sub: 'Emerald Rank', color: [251, 191, 36] },
+    ];
+
+    metricsData.forEach((m, idx) => {
+      const bx = startX + idx * (boxW + 6);
+      pdf.setFillColor(15, 23, 42);
+      pdf.setDrawColor(255, 255, 255);
+      pdf.setLineWidth(0.2);
+      pdf.roundedRect(bx, boxY, boxW, boxH, 3, 3, 'FD');
+
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(8);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(m.label, bx + boxW / 2, boxY + 8, { align: 'center' });
+
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(16);
+      pdf.setTextColor(m.color[0], m.color[1], m.color[2]);
+      pdf.text(m.val, bx + boxW / 2, boxY + 20, { align: 'center' });
+
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(m.sub, bx + boxW / 2, boxY + 28, { align: 'center' });
+    });
+
+    // Footer credentials
+    pdf.setFont('courier', 'normal');
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text(`Credential ID: ${certId}`, 25, h - 26);
+    pdf.text(`Ledger Hash: ${verificationHash}`, 25, h - 21);
+    pdf.text(`Verification Node: ${city} Circular Grid`, 25, h - 16);
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(74, 222, 128);
+    pdf.text('STATUS: ACTIVE & VERIFIED', w - 25, h - 21, { align: 'right' });
+
+    const safeName = (userName || 'Citizen').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+    pdf.save(`EcoTwin_Climate_Certificate_${safeName}.pdf`);
+  };
+
+  const handleDownloadPdf = async () => {
+    setIsDownloading(true);
+    try {
+      if (certRef.current) {
+        const element = certRef.current;
+        const canvas = await html2canvas(element, {
+          scale: 2.5,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#091322',
+          logging: false,
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight,
+        });
+
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4',
+        });
+
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        const margin = 10;
+        const maxW = pageWidth - margin * 2;
+        const maxH = pageHeight - margin * 2;
+
+        let imgW = maxW;
+        let imgH = (canvas.height * imgW) / canvas.width;
+
+        if (imgH > maxH) {
+          imgH = maxH;
+          imgW = (canvas.width * imgH) / canvas.height;
+        }
+
+        const xOffset = (pageWidth - imgW) / 2;
+        const yOffset = (pageHeight - imgH) / 2;
+
+        pdf.setFillColor(9, 19, 34);
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+        pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgW, imgH, undefined, 'FAST');
+
+        const safeName = (userName || 'Citizen').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+        pdf.save(`EcoTwin_Climate_Certificate_${safeName}.pdf`);
+      } else {
+        generateVectorPdfFallback();
+      }
+    } catch (err) {
+      console.warn('Canvas capture fallback to vector jsPDF:', err);
+      generateVectorPdfFallback();
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
       <div className="glass-card max-w-2xl w-full rounded-[32px] p-6 lg:p-8 relative border border-amber-400/40 shadow-[0_0_60px_rgba(251,191,36,0.25)] max-h-[90vh] overflow-y-auto">
@@ -68,12 +231,23 @@ export const ImpactCertificateModal: React.FC<ImpactCertificateModalProps> = ({
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-white/60 hover:text-white rounded-full bg-white/5 cursor-pointer transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDownloadPdf}
+              disabled={isDownloading}
+              className="py-1.5 px-3.5 rounded-full bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/40 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+              title="Download Official PDF Certificate"
+            >
+              <Download className="w-3.5 h-3.5 text-amber-400" />
+              <span>{isDownloading ? 'Exporting...' : 'Download PDF'}</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 text-white/60 hover:text-white rounded-full bg-white/5 cursor-pointer transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Certificate Canvas Card */}
@@ -161,6 +335,18 @@ export const ImpactCertificateModal: React.FC<ImpactCertificateModalProps> = ({
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Primary Download Button */}
+        <div className="mb-5">
+          <button
+            onClick={handleDownloadPdf}
+            disabled={isDownloading}
+            className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-amber-500/25 cursor-pointer active:scale-[0.99] disabled:opacity-75 disabled:cursor-wait"
+          >
+            <Download className="w-5 h-5 text-slate-950" />
+            <span>{isDownloading ? 'Generating High-Resolution Certificate PDF...' : 'Download Certificate as PDF'}</span>
+          </button>
         </div>
 
         {/* Social Share & Export Actions */}
