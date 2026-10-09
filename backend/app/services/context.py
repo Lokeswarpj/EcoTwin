@@ -12,7 +12,10 @@ CACHE_TTL_SECONDS = 600  # 10 minutes
 CITY_COORDS = {
     "Bengaluru": {"lat": 12.9716, "lon": 77.5946},
     "Mumbai": {"lat": 19.0760, "lon": 72.8777},
-    "Delhi": {"lat": 28.6139, "lon": 77.2090}
+    "Delhi": {"lat": 28.6139, "lon": 77.2090},
+    "Hyderabad": {"lat": 17.3850, "lon": 78.4867},
+    "Chennai": {"lat": 13.0827, "lon": 80.2707},
+    "Kochi": {"lat": 9.9312, "lon": 76.2673}
 }
 
 def get_city_context(city: str = "Bengaluru") -> Dict[str, Any]:

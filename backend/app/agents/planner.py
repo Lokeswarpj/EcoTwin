@@ -22,6 +22,66 @@ def generate_weekly_plan(city: str = "Bengaluru") -> Tuple[WeeklyPlanResponse, L
     cfg = get_budget_config()
     ctx = get_city_context(city)
 
+    # City-specific transit and grid profiles
+    city_profiles = {
+        "Delhi": {
+            "mobility_title": "Commit to 3 Delhi Metro (DMRC) Commute Days",
+            "mobility_desc": f"Weather is {ctx['condition']} (AQI {ctx['aqi']}). Swap private vehicle driving with DMRC Yellow/Blue Line transit to avoid smog emissions.",
+            "mobility_steps": [
+                {"text": "Recharge DMRC smartcard online (+10 bonus pts)", "done": False},
+                {"text": "Board Metro at Rajiv Chowk / Kashmere Gate by 09:00", "done": False}
+            ],
+            "energy_desc": "Align heavy appliance cycles between 11:30 AM - 02:30 PM when Northern Grid & Delhi rooftop solar generation peaks."
+        },
+        "Mumbai": {
+            "mobility_title": "Commit to 3 Mumbai Metro & Suburban Rail Days",
+            "mobility_desc": f"Weather is {ctx['condition']} (AQI {ctx['aqi']}). Swap Western Express highway driving with Metro Line 2A/7 & Local transit.",
+            "mobility_steps": [
+                {"text": "Recharge Mumbai 1 Mobility Card (+10 bonus pts)", "done": False},
+                {"text": "Board Metro at Andheri / Gundavali station by 09:00", "done": False}
+            ],
+            "energy_desc": "Align heavy consumption cycles between 11:30 AM - 02:30 PM to avoid peak commercial power tariffs."
+        },
+        "Hyderabad": {
+            "mobility_title": "Commit to 3 Hyderabad Metro Rail Commute Days",
+            "mobility_desc": f"Weather is {ctx['condition']} (AQI {ctx['aqi']}). Swap solo cab rides with Hyderabad Metro Red/Blue Line.",
+            "mobility_steps": [
+                {"text": "Recharge TS Metro smartcard online (+10 bonus pts)", "done": False},
+                {"text": "Board Metro at Ameerpet / Hitec City station by 09:15", "done": False}
+            ],
+            "energy_desc": "Align heavy washing & cooling cycles between 11:30 AM - 02:30 PM to match TSSPDCL peak solar feed."
+        },
+        "Chennai": {
+            "mobility_title": "Commit to 3 Chennai Metro (CMRL) Commute Days",
+            "mobility_desc": f"Weather is {ctx['condition']} (AQI {ctx['aqi']}). Swap solo motor travel with CMRL Blue Line transit.",
+            "mobility_steps": [
+                {"text": "Recharge Singara Chennai NCMC Card (+10 bonus pts)", "done": False},
+                {"text": "Board Metro at Central / Guindy station by 09:00", "done": False}
+            ],
+            "energy_desc": "Align high-draw appliance cycles between 11:30 AM - 02:30 PM during peak coastal solar hours."
+        },
+        "Kochi": {
+            "mobility_title": "Commit to 3 Kochi Metro & Water Metro Commute Days",
+            "mobility_desc": f"Weather is {ctx['condition']} (AQI {ctx['aqi']}). Take zero-emission Kochi Water Metro & Blue Line instead of congested road transit.",
+            "mobility_steps": [
+                {"text": "Recharge Kochi1 Card online (+10 bonus pts)", "done": False},
+                {"text": "Board Metro at Aluva / Edapally station by 09:00", "done": False}
+            ],
+            "energy_desc": "Align heavy appliance cycles between 11:30 AM - 02:30 PM to maximize KSEB green solar intake."
+        },
+        "Bengaluru": {
+            "mobility_title": "Commit to 3 Namma Metro Commute Days",
+            "mobility_desc": f"Weather is {ctx['condition']} (AQI {ctx['aqi']}). Swap solo driving with Purple Line transit.",
+            "mobility_steps": [
+                {"text": "Recharge smartcard online (+10 bonus pts)", "done": False},
+                {"text": "Board Metro at Indiranagar station by 09:15", "done": False}
+            ],
+            "energy_desc": "Align heavy appliance cycles between 11:30 AM - 02:30 PM when Karnataka grid renewable mix is highest."
+        }
+    }
+
+    prof = city_profiles.get(city, city_profiles["Delhi"] if "delhi" in city.lower() else city_profiles["Bengaluru"])
+
     # Planned priority actions for the week
     plan_actions_data = [
         {
@@ -39,21 +99,18 @@ def generate_weekly_plan(city: str = "Bengaluru") -> Tuple[WeeklyPlanResponse, L
         },
         {
             "category": "Mobility Negotiator",
-            "title": "Commit to 3 Namma Metro Commute Days",
-            "description": f"Weather is {ctx['condition']} (AQI {ctx['aqi']}). Swap solo driving with Purple Line transit.",
+            "title": prof["mobility_title"],
+            "description": prof["mobility_desc"],
             "co2_saving_kg": 4.35,
             "points": 50,
             "color": "amber",
             "agent_name": "MobilityNegotiatorAgent",
-            "steps": [
-                {"text": "Recharge smartcard online (+10 bonus pts)", "done": False},
-                {"text": "Board Metro at Indiranagar station by 09:15", "done": False}
-            ]
+            "steps": prof["mobility_steps"]
         },
         {
             "category": "Peak Load Shift",
             "title": "Shift Laundry & Water Heating to Midday Solar Peak",
-            "description": "Align heavy appliance cycles between 11:30 AM - 02:30 PM when Karnataka grid renewable mix is highest.",
+            "description": prof["energy_desc"],
             "co2_saving_kg": 3.80,
             "points": 35,
             "color": "blue",

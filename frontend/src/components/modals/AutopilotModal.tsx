@@ -2,17 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { X, Bot, RefreshCw, CheckCircle2, Sparkles, ChevronDown, ChevronUp, ArrowRight, Zap, Utensils, Train } from 'lucide-react';
 import { generateWeeklyPlan } from '../../services/api';
 import { WeeklyPlan, TraceItem } from '../../types';
+import { LanguageCode, getTranslation } from '../../i18n/translations';
 
 interface AutopilotModalProps {
   isOpen: boolean;
   city?: string;
+  language?: LanguageCode;
   onClose: () => void;
   onPlanGenerated: () => void;
 }
 
 export const AutopilotModal: React.FC<AutopilotModalProps> = ({
   isOpen,
-  city = 'Bengaluru',
+  city = 'Delhi',
+  language = 'en',
   onClose,
   onPlanGenerated
 }) => {
@@ -72,7 +75,9 @@ export const AutopilotModal: React.FC<AutopilotModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-display text-2xl text-white">AI Autopilot Weekly Plan</h3>
+                <h3 className="font-display text-2xl text-white">
+                  {getTranslation('autopilot.modal_title', language, city)}
+                </h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-green-500/20 text-green-300 border border-green-500/30">
                   Ready
                 </span>
@@ -212,14 +217,14 @@ export const AutopilotModal: React.FC<AutopilotModalProps> = ({
                 className="w-full sm:w-auto px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-xs font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer border border-white/15"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
-                {isGenerating ? 'Re-Synthesizing...' : 'Re-Run AI Autopilot'}
+                {isGenerating ? 'Re-Synthesizing...' : getTranslation('autopilot.rerun_btn', language, city)}
               </button>
 
               <button
                 onClick={handleApplyPlan}
                 className="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-black text-sm font-semibold hover:bg-white/90 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/10"
               >
-                <span>Apply Plan & View on Dashboard</span>
+                <span>{getTranslation('autopilot.apply_btn', language, city)}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

@@ -15,11 +15,12 @@ import { HistoryModal } from './components/modals/HistoryModal';
 import { Footer } from './components/layout/Footer';
 import { fetchDashboard, toggleActionStep, analyzeMedia } from './services/api';
 import { DashboardResponse, ActionCard, TraceItem } from './types';
+import { LanguageCode } from './i18n/translations';
 import { Sparkles } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const [city, setCity] = useState<string>('Bengaluru');
-  const [language, setLanguage] = useState<string>('en');
+  const [city, setCity] = useState<string>('Delhi');
+  const [language, setLanguage] = useState<LanguageCode>('dual');
   const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(null);
   const [actions, setActions] = useState<ActionCard[]>([]);
   const [agentTrace, setAgentTrace] = useState<TraceItem[]>([]);
@@ -135,12 +136,15 @@ export const App: React.FC = () => {
         language={language}
         onOpenLocation={() => setLocationOpen(true)}
         onOpenAutopilot={() => setAutopilotOpen(true)}
+        onSelectLanguage={(l) => setLanguage(l)}
       />
 
       {/* Main Container */}
       <main className="pt-32 px-6 lg:px-20 max-w-[1440px] mx-auto pb-16">
         {/* Hero Section */}
         <Hero
+          language={language}
+          city={city}
           onSnapScan={() => setScannerOpen(true)}
           onViewDemo={() => setAutopilotOpen(true)}
         />
@@ -150,10 +154,11 @@ export const App: React.FC = () => {
           <section className="lg:col-span-8 space-y-8">
             <UploadHub
               city={city}
+              language={language}
               onAnalysisSuccess={handleAnalysisSuccess}
               onOpenScanner={() => setScannerOpen(true)}
             />
-            <MetricCards metrics={dashboardData?.metrics} />
+            <MetricCards metrics={dashboardData?.metrics} language={language} city={city} />
           </section>
 
           <aside className="lg:col-span-4 space-y-8">
@@ -165,6 +170,8 @@ export const App: React.FC = () => {
         {/* AI Action Stream */}
         <ActionStream
           actions={actions}
+          language={language}
+          city={city}
           onToggleStep={handleToggleStep}
           onOpenHistory={() => setHistoryOpen(true)}
         />
@@ -186,6 +193,7 @@ export const App: React.FC = () => {
       <AutopilotModal
         isOpen={autopilotOpen}
         city={city}
+        language={language}
         onClose={() => setAutopilotOpen(false)}
         onPlanGenerated={() => {
           loadData(city);
@@ -195,7 +203,9 @@ export const App: React.FC = () => {
       <LocationModal
         isOpen={locationOpen}
         selectedCity={city}
+        selectedLanguage={language}
         onSelectCity={(newCity) => setCity(newCity)}
+        onSelectLanguage={(l) => setLanguage(l)}
         onClose={() => setLocationOpen(false)}
       />
       <HistoryModal

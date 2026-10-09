@@ -1,32 +1,41 @@
 import React from 'react';
 import { CheckCircle, Circle, ArrowRight, Sparkles, Train, Bus } from 'lucide-react';
 import { ActionCard } from '../../types';
+import { LanguageCode, getTranslation } from '../../i18n/translations';
 
 interface ActionStreamProps {
   actions: ActionCard[];
+  language?: LanguageCode;
+  city?: string;
   onToggleStep: (actionId: string, stepIndex: number, currentStatus: boolean) => void;
   onOpenHistory: () => void;
 }
 
 export const ActionStream: React.FC<ActionStreamProps> = ({
   actions,
+  language = 'en',
+  city = 'Delhi',
   onToggleStep,
   onOpenHistory
 }) => {
+  const title = getTranslation('action.stream_title', language, city);
+  const subtitle = getTranslation('action.stream_sub', language, city);
+  const historyText = getTranslation('action.history_btn', language, city);
+
   return (
     <section id="action-stream-section" className="mb-20">
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h2 className="text-4xl font-display">AI Action Stream</h2>
+          <h2 className="text-4xl font-display">{title}</h2>
           <p className="text-sm text-white/50 mt-1">
-            Live autonomous interventions by Gemini Multi-Agent Swarm
+            {subtitle}
           </p>
         </div>
         <button
           onClick={onOpenHistory}
           className="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"
         >
-          <span>View History</span>
+          <span>{historyText}</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>

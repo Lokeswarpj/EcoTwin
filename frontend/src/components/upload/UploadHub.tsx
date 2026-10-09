@@ -2,40 +2,20 @@ import React, { useState, useRef } from 'react';
 import { UploadCloud, Camera, Mic, Loader2, FileImage, CheckCircle2 } from 'lucide-react';
 import { analyzeMedia } from '../../services/api';
 import { ActionCard, TraceItem } from '../../types';
+import { LanguageCode, getTranslation } from '../../i18n/translations';
 
 interface UploadHubProps {
   city?: string;
+  language?: LanguageCode;
   onAnalysisSuccess: (action: ActionCard, trace: TraceItem[]) => void;
   onOpenScanner: () => void;
 }
 
 type TabType = 'waste' | 'food' | 'energy' | 'mobility';
 
-const TAB_META: Record<TabType, { label: string; title: string; sub: string }> = {
-  waste: {
-    label: 'Waste Photo',
-    title: 'Upload or drag & drop waste item photo',
-    sub: 'Instant Gemini polymer breakdown, BBMP segregation & landfill diversion'
-  },
-  food: {
-    label: 'Fridge / Receipt',
-    title: 'Upload fridge photo or grocery receipt',
-    sub: 'Scans perishables, estimates shelf-life & suggests low-emission recipes'
-  },
-  energy: {
-    label: 'Electricity Bill',
-    title: 'Upload BESCOM / Electricity bill PDF or photo',
-    sub: 'Extracts kWh consumption & calculates peak solar load shifting'
-  },
-  mobility: {
-    label: 'Commute Note',
-    title: 'Describe your daily commute or upload transit ticket',
-    sub: 'Compares Metro vs Bus vs Driving with time and emission trade-offs'
-  }
-};
-
 export const UploadHub: React.FC<UploadHubProps> = ({
-  city = 'Bengaluru',
+  city = 'Delhi',
+  language = 'en',
   onAnalysisSuccess,
   onOpenScanner
 }) => {
@@ -90,11 +70,21 @@ export const UploadHub: React.FC<UploadHubProps> = ({
     }
   };
 
+  const tabLabels: Record<TabType, string> = {
+    waste: getTranslation('tab.waste', language, city),
+    food: getTranslation('tab.food', language, city),
+    energy: getTranslation('tab.energy', language, city),
+    mobility: getTranslation('tab.mobility', language, city),
+  };
+
+  const browseBtnText = getTranslation('upload.browse', language, city);
+  const promptText = getTranslation('upload.prompt', language, city);
+
   return (
     <div className="glass p-8 rounded-[32px] fade-rise delay-600">
       <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-6">
         <div className="flex gap-6 overflow-x-auto no-scrollbar">
-          {(Object.keys(TAB_META) as TabType[]).map((tab) => (
+          {(['waste', 'food', 'energy', 'mobility'] as TabType[]).map((tab) => (
             <button
               key={tab}
               onClick={() => {
@@ -108,7 +98,7 @@ export const UploadHub: React.FC<UploadHubProps> = ({
                   : 'text-white/40 hover:text-white'
               }`}
             >
-              {TAB_META[tab].label}
+              {tabLabels[tab]}
             </button>
           ))}
         </div>
@@ -163,18 +153,23 @@ export const UploadHub: React.FC<UploadHubProps> = ({
 
             <div className="text-center px-4">
               <p className="text-white/80 font-medium text-sm md:text-base">
-                {TAB_META[activeTab].title}
+                {promptText}
               </p>
-              <p className="text-xs text-white/40 mt-1 max-w-md">{TAB_META[activeTab].sub}</p>
+              <p className="text-xs text-white/40 mt-1 max-w-md">
+                {activeTab === 'waste' && 'Instant Gemini polymer breakdown, city segregation & landfill diversion'}
+                {activeTab === 'food' && 'Scans perishables, estimates shelf-life & suggests low-emission recipes'}
+                {activeTab === 'energy' && 'Extracts kWh consumption & calculates peak solar load shifting'}
+                {activeTab === 'mobility' && 'Compares Metro vs Bus vs Driving with time and emission trade-offs'}
+              </p>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-3 mt-1" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="px-5 py-2.5 rounded-full bg-white text-black font-medium text-xs md:text-sm hover:bg-white/90 transition-all flex items-center gap-2 shadow-md cursor-pointer"
+                className="px-5 py-2.5 rounded-full bg-white text-black font-semibold text-xs md:text-sm hover:bg-white/90 transition-all flex items-center gap-2 shadow-md cursor-pointer"
               >
                 <FileImage className="w-4 h-4" />
-                Browse Device Photos
+                {browseBtnText}
               </button>
 
               <button
@@ -191,7 +186,7 @@ export const UploadHub: React.FC<UploadHubProps> = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleSimulateText('Commute: 12 km to work daily via car vs metro in Bengaluru');
+                  handleSimulateText(`Commute: 12 km daily travel in ${city}`);
                 }}
                 className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/15 cursor-pointer"
                 title="Voice / Text Commute Note"
